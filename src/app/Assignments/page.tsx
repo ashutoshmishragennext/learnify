@@ -94,25 +94,37 @@
 
 // pagex.tsx
 
-import ProfileSection from "@/app/DashBoard/ProfileSection";
-import QuizzesList from "./QuizzesList";
-import { auth } from "../../../auth";
+// import ProfileSection from "@/app/DashBoard/ProfileSection";
+// import QuizzesList from "./QuizzesList";
+// import { auth } from "../../../auth";
 
 
-const Quizzes = async () => {
-  const session = await auth();
+// const Quizzes = async () => {
+//   const session = await auth();
+//   return (
+//     <div className="flex flex-row w-full h-screen">
+//       {/* Main Content */}
+//       <div className="flex-grow p-4">
+//         <QuizzesList />
+//       </div>
+//       <div className="w-72 bg-white border-l border-gray-200 ">
+//           <ProfileSection session={session} />
+//         </div>
+
+//     </div>
+//   );
+// };
+
+// export default Quizzes;
+
+import React from 'react'
+
+const page = () => {
   return (
-    <div className="flex flex-row w-full h-screen">
-      {/* Main Content */}
-      <div className="flex-grow p-4">
-        <QuizzesList />
-      </div>
-      <div className="w-72 bg-white border-l border-gray-200 ">
-          <ProfileSection session={session} />
-        </div>
-
+    <div>
+      hi
     </div>
-  );
-};
+  )
+}
 
-export default Quizzes;
+export default page

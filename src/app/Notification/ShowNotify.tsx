@@ -81,13 +81,13 @@
 
 import React, { useState } from "react";
 import Notification from "../Notification/Notification";
-import Sidebar from "../DashBoard/Sidebar";
-import ProfileSection from "../DashBoard/ProfileSection";
-import { useSession } from "next-auth/react";
+// import Sidebar from "../(protected)/dashboard/Sidebar";
+// import ProfileSection from "../(protected)/dashboard/ProfileSection";
+// import { useSession } from "next-auth/react";
 import { IoPersonCircleOutline, IoClose, IoMenu } from "react-icons/io5";
 
 const ShowNotify = () => {
-  const { data: session } = useSession();
+  // const { data: session } = useSession();
   
   // State to handle Sidebar & Profile Section toggling in mobile view
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -111,7 +111,7 @@ const ShowNotify = () => {
       <div className="flex flex-grow">
         {/* Sidebar - 20% width on larger screens */}
         <div className="hidden md:block w-1/5 bg-white text-gray-800 border-r border-gray-200">
-          <Sidebar />
+          {/* <Sidebar /> */}
         </div>
 
         {/* Mobile Sidebar (Slide-in) */}
@@ -123,7 +123,7 @@ const ShowNotify = () => {
           <button className="absolute top-4 right-4 text-gray-600" onClick={() => setIsSidebarOpen(false)}>
             <IoClose size={30} />
           </button>
-          <Sidebar />
+          {/* <Sidebar /> */}
         </div>
 
         {/* Notification Content (60% width) */}
@@ -133,7 +133,7 @@ const ShowNotify = () => {
 
         {/* Profile Section - 20% width on larger screens */}
         <div className="hidden md:block w-1/5 bg-white border-l border-gray-200">
-          <ProfileSection session={session} />
+          {/* <ProfileSection session={session} /> */}
         </div>
 
         {/* Mobile Profile Section (Slide-in) */}
@@ -145,7 +145,7 @@ const ShowNotify = () => {
           <button className="absolute top-4 right-4 text-gray-600" onClick={() => setIsProfileOpen(false)}>
             <IoClose size={30} />
           </button>
-          <ProfileSection session={session} />
+          {/* <ProfileSection session={session} /> */}
         </div>
       </div>
     </div>

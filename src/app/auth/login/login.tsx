@@ -22,7 +22,7 @@ const Login = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const redirectPath = searchParams.get("redirect") || "/DashBoard";
+  const redirectPath = searchParams.get("redirect") || "/dashboard";
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

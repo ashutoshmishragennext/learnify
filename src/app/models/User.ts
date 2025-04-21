@@ -7,6 +7,7 @@ export interface ISubmoduleProgress {
   // watchedPercentage?: number;
   // timeSpent?: number; // In seconds
 }
+export type UserRole = 'STUDENT' | 'ADMIN';
 
 export interface IModuleProgress {
   moduleId: number; // Identifier for the module
@@ -43,6 +44,7 @@ export interface IUser extends Document {
   resetTokenExpiry?: Date;
   lastLoginAt?: Date;
   lastActiveAt?: Date;
+  role: UserRole;
 }
 
 const SubmoduleProgressSchema: Schema = new Schema({
@@ -81,6 +83,12 @@ const UserSchema: Schema = new Schema(
         return !this.githubId && !this.googleId;
       },
     },
+    role: {
+      type: String,
+      enum: ['STUDENT', 'ADMIN'],
+      default: 'STUDENT',
+      required: true,
+    },
     avatar: { type: String },
     githubId: { type: String, unique: true, sparse: true },
     googleId: { type: String, unique: true, sparse: true },
@@ -109,8 +117,8 @@ const UserSchema: Schema = new Schema(
   { timestamps: true }
 );
 
-export default mongoose.models.User ||
-  mongoose.model<IUser>("User", UserSchema);
+export default (mongoose.models?.User || 
+  mongoose.model<IUser>("User", UserSchema));
 
 // import mongoose, { Schema, Document } from 'mongoose';
 // // import { CourseSchema, ICourse } from './Course'; // Assuming the Course schema is exported properly.

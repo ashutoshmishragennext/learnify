@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import NextAuth from 'next-auth';
 import GitHubProvider from 'next-auth/providers/github';
 import GoogleProvider from 'next-auth/providers/google';
@@ -11,7 +12,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     CredentialsProvider({
       name: 'Credentials',
       async authorize(credentials) {
-        const { email, password, rememberMe } = credentials || {};
+        const { email, password, rememberMe} = credentials || {};
 
         if (!email || !password) {
           console.log("Missing Credentails!");
@@ -34,7 +35,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           user.lastLoginAt = new Date();
           user.lastActiveAt = new Date();
           await user.save();
-          return { id: user._id.toString(), name: user.name, email: user.email, rememberMe };
+          return { id: user._id.toString(), name: user.name, email: user.email, rememberMe ,role: user.role };
         }
 
 
@@ -48,7 +49,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         email: { label: 'Email', type: 'text' },
         otp: { label: 'OTP', type: 'number' },
       },
-      async authorize(credentials, req) {
+      async authorize(credentials) {
         
         const { email, otp } = credentials || {};
 
@@ -93,7 +94,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   trustHost: true, 
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ account, profile }) {
 
       // if(!profile){
       //   return false;
@@ -176,6 +177,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.rememberMe = (user as any).rememberMe || false;
         token.name = user.name;
         token.email = user.email;
+        token.role = user.role;
       }
 
       token.provider = account?.provider || null;
@@ -188,6 +190,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.name = token.name;
         session.user.email = token.email as string;
         session.user.image = token.image as string;
+        session.user.role =  token.role as string;
         (session.user as any).provider = token.provider as string;
         (session.user as any).phone = (token.phone as number) || null ;
       }
