@@ -23,7 +23,6 @@ export default auth(async (req) => {
   const isPublicRoute = publicRoutes.includes(pathname);
   const isAuthRoute = authRoutes.includes(pathname);
   const isPublicApi = publicApis.some((api) => pathname.startsWith(api));
-  console.log("ErrorRRRRRRRRRRRRRRRRRRRRRRRRRRR1");
   
   // 1. Allow all API auth routes
   if (isApiAuthRoute) {
@@ -39,7 +38,6 @@ export default auth(async (req) => {
   if (!isLoggedIn && !isPublicRoute && !isPublicApi && !isAuthRoute) {
     return NextResponse.redirect(new URL("/auth/login", req.url));
   }
-  console.log("ErrorRRRRRRRRRRRRRRRRRRRRRRRRRRR2");
   // 4. Check role-based access
   if (isLoggedIn) {
     const token = await getToken({
@@ -48,28 +46,24 @@ export default auth(async (req) => {
       secureCookie: process.env.NODE_ENV === "production",
     });
     
-    console.log("ErrorRRRRRRRRRRRRRRRRRRRRRRRRRRRR3");
     if (!token ) {
       // console.log(token);
       
       console.warn("Token missing or no role found.");
       return NextResponse.redirect(new URL("/auth/login", req.url));
     }
-    console.log("ErrorRRRRRRRRRRRRRRRRRRRRRRRRRRRR4");
     // Loop through protected routes
     for (const pattern in protectedRoutes) {
       const regex = new RegExp(pattern);
       if (regex.test(pathname)) {
         const allowedRoles = protectedRoutes[pattern];
         if (!allowedRoles.includes(token.role)) {
-          console.log("ErrorRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
           console.warn(`Access denied for role ${token.role} on ${pathname}`);
           return NextResponse.redirect(new URL("/auth/login", req.url));
         }
       }
     }
   }
-  console.log("ErrorRRRRRRRRRRRRRRRRRRRRRRRRRRRR5");
   return NextResponse.next();
 
 });

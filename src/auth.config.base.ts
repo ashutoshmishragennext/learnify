@@ -8,7 +8,7 @@ import type { NextAuthConfig } from "next-auth";
 export const authConfigBase: NextAuthConfig = {
     pages: {
         signIn: "/auth/login",
-        error: "/auth/error",
+        // error: "/auth/error",
     },
     session: {
         strategy: "jwt",

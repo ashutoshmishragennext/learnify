@@ -1,11 +1,31 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import NextAuth from 'next-auth';
+import NextAuth, { DefaultSession } from 'next-auth';
 import GitHubProvider from 'next-auth/providers/github';
 import GoogleProvider from 'next-auth/providers/google';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/dbConnect';
 import User from '@/app/models/User';
+
+export type ExtendedUser = DefaultSession["user"] & {
+  role: string;
+};
+
+declare module "next-auth" {
+  /**
+   * Returned by `auth`, `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
+   */
+  interface Session {
+    user: ExtendedUser;
+  }
+}
+
+declare module "next-auth/jwt" {
+  /** Returned by the `jwt` callback and `auth`, when using JWT sessions */
+  interface JWT {
+    role?: string;
+  }
+}
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -177,7 +197,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.rememberMe = (user as any).rememberMe || false;
         token.name = user.name;
         token.email = user.email;
-        token.role = user.role as string;
+        token.role = (user as any).role || null;
       }
 
       token.provider = account?.provider || null;
