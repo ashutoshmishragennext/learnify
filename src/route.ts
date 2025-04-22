@@ -7,7 +7,7 @@ export const DEFAULT_LOGIN_REDIRECT: string = "/dashboard";
 export const apiAuthPrefix: string = "/api/auth";
 
 // Routes which are accessible to all.
-export const publicRoutes: string[] = ["/", "/auth/verify-email"];
+export const publicRoutes: string[] = ["/", "/auth/verify-email","/updatingDB/"];
 
 // APIs which are accessible to all.
 export const publicApis: string[] = ["/api/uploadthing"];
@@ -19,6 +19,7 @@ export const authRoutes: string[] = [
   "/auth/register",
   "/auth/forgot-password",
   "/auth/reset-password",
+  "/auth-check"
 ];
 
 // Routes which are protected with diffferent roles

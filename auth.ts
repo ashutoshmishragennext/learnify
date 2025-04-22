@@ -177,7 +177,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.rememberMe = (user as any).rememberMe || false;
         token.name = user.name;
         token.email = user.email;
-        token.role = user.role;
+        token.role = user.role as string;
       }
 
       token.provider = account?.provider || null;

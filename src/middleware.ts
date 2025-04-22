@@ -1,4 +1,4 @@
-import authConfig from "./auth.config";
+import { authConfigBase } from "./auth.config.base";
 import {
   apiAuthPrefix,
   authRoutes,
@@ -11,9 +11,7 @@ import NextAuth from "next-auth";
 import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
 
-
-
-const { auth } = NextAuth(authConfig);
+const { auth } = NextAuth(authConfigBase);
 
 export default auth(async (req) => {
   const { auth, nextUrl } = req;
@@ -82,4 +80,12 @@ export const config = {
     "/((?!_next|.*\\..*).*)",
     "/(api|trpc)(.*)",
   ],
+  
+    unstable_allowDynamic: [
+      // allows a single file
+      '/lib/utilities.js',
+      // use a glob to allow anything in the function-bind 3rd party module
+      '**/node_modules/function-bind/**',
+    ],
+  
 };

@@ -1,14 +1,12 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+// src/auth.config.ts
+import { authConfigBase } from "./auth.config.base";
 import { LoginSchema } from "@/validaton-schema";
 import bcrypt from "bcryptjs";
 import Credentials from "next-auth/providers/credentials";
 import { findUserByEmail } from "./actions/user";
-import type { NextAuthConfig } from "next-auth";
-console.log("i am in")
-export const authConfig: NextAuthConfig = {
 
- 
-  
+export const authConfig = {
+  ...authConfigBase,
   providers: [
     Credentials({
       async authorize(credentials) {
@@ -21,7 +19,6 @@ export const authConfig: NextAuthConfig = {
         const { email, password } = validation.data;
 
         const user = await findUserByEmail(email);
-        console.log("userrrrrrrrrrrrrrrrrrr",user);
         
         if (!user || !user.password) {
           console.error("User not found or password missing");
@@ -34,7 +31,6 @@ export const authConfig: NextAuthConfig = {
           return null;
         }
 
-        // Return necessary fields (id, name, email, role)
         return {
           id: user._id.toString(),
           name: user.name,
@@ -44,40 +40,6 @@ export const authConfig: NextAuthConfig = {
       },
     }),
   ],
- 
-  callbacks: {
-    async jwt({ token, user }) {
-      // When user is logged in, store their role in token
-      // console.log("user tocken",user);
-      console.log("tocken",token);
-      
-      
-      if (user) {
-        token.role = (user as any).role;
-      }
-      return token;
-    },
-
-    async session({ session, token }) {
-      // Pass the role from token to session
-      if (session.user) {
-        (session.user as any).role = token.role;
-      }
-      return session;
-    },
-  },
-
-  pages: {
-    signIn: "/auth/login",
-    error: "/auth/error",
-  },
-
-  session: {
-    strategy: "jwt",
-  },
-
-  // Optional: Debugging
-  debug: process.env.NODE_ENV === "development",
 };
 
 export default authConfig;
