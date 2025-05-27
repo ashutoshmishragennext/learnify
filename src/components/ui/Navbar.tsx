@@ -86,9 +86,9 @@ const Navbar: React.FC<{ session?: Session | null |  any }> = ({ session }) => {
             </button>
             {session && (
               <button
-                onClick={() => handleNavigation("/DashBoard")}
+                onClick={() => handleNavigation("/dashboard/admin")}
                 className={`hover:underline ${
-                  pathname === "/DashBoard" ? "text-yellow-300" : ""
+                  pathname === "/dashboard/admin" ? "text-yellow-300" : ""
                 }`}
               >
                 Dashboard
@@ -215,9 +215,9 @@ const Navbar: React.FC<{ session?: Session | null |  any }> = ({ session }) => {
                 </button>
                 {session ? (
                   <button
-                    onClick={() => handleNavigation("/DashBoard")}
+                    onClick={() => handleNavigation("/dashboard/admin")}
                     className={`text-gray-800 hover:text-purple-600 ${
-                      pathname === "/DashBoard" ? "font-bold" : ""
+                      pathname === "/dashboard/admin" ? "font-bold" : ""
                     }`}
                   >
                     Dashboard
