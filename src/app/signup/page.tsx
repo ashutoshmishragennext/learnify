@@ -265,7 +265,7 @@ const Signup = () => {
           <p className="text-center text-gray-600 mt-4">
             Already have an account?{" "}
             <Link
-              href="/login"
+              href="/auth/login"
               onClick={handleLoader}
               className="text-purple-600 hover:underline"
             >

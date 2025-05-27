@@ -80,6 +80,8 @@ const Login = () => {
     setLoader(true);
   };
 
+  
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
       <div className="flex flex-col md:flex-row bg-white shadow-lg rounded-lg w-full max-w-4xl overflow-hidden">
@@ -225,7 +227,7 @@ const Login = () => {
               Don’t have an account?{" "}
               <Link
                 onClick={handleLoader}
-                href="/signup"
+                href="/auth/register"
                 className="text-purple-600 hover:underline"
               >
                 Sign Up

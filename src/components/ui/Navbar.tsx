@@ -31,7 +31,7 @@ const Navbar: React.FC<{ session?: Session | null |  any }> = ({ session }) => {
 
   const handleLogout = async () => {
     setLoading(true);
-    await signOut({ redirect: true, callbackUrl: "/login" });
+    await signOut({ redirect: true, callbackUrl: "/auth/login" });
     setLoading(false);
   };
 
@@ -128,13 +128,13 @@ const Navbar: React.FC<{ session?: Session | null |  any }> = ({ session }) => {
             {!session ? (
               <div className="hidden md:flex space-x-2">
                 <button
-                  onClick={() => handleNavigation("/signup")}
+                  onClick={() => handleNavigation("/auth/register")}
                   className="bg-white text-black font-semibold px-4 py-2 rounded-full hover:bg-gray-200 transition"
                 >
                   Sign Up
                 </button>
                 <button
-                  onClick={() => handleNavigation("/login")}
+                  onClick={() => handleNavigation("/auth/login")}
                   className="bg-white text-black font-semibold px-4 py-2 rounded-full hover:bg-gray-200 transition"
                 >
                   Login
@@ -228,14 +228,14 @@ const Navbar: React.FC<{ session?: Session | null |  any }> = ({ session }) => {
                 {!session ? (
                   <div className="flex flex-col space-y-4">
                     <button
-                      onClick={() => handleNavigation("/signup")}
+                      onClick={() => handleNavigation("/auth/register")}
                       className="text-gray-800 hover:text-purple-600"
                     >
                       Sign Up
                     </button>
 
                     <button
-                      onClick={() => handleNavigation("/login")}
+                      onClick={() => handleNavigation("/auth/login")}
                       className="text-gray-800 hover:text-purple-600"
                     >
                       Login
