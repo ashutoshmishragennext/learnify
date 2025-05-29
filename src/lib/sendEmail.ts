@@ -22,7 +22,7 @@ const sendEmail = async(email:string, task:string, other?: null | undefined | nu
     
        let toDo; let subject, description, buttonDesc, heading;
         if(task === "Verification"){
-          const verifyUrl = `http://localhost:3000/verifyEmail/${verifyToken}`;
+          const verifyUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/verifyEmail/${verifyToken}`;
           toDo = verifyUrl;
           subject = "Verify Your Email";
           heading = "Verify Your Email";

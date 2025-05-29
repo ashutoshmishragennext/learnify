@@ -115,6 +115,9 @@ const VerifyEmail: React.FC = () => {
         setIsLoading(true);
         setError(null);
 
+        console.log("Token" , token);
+        
+
         const res = await fetch("/api/emailVerification", {
           method: "POST",
           headers: { "Content-Type": "application/json" },

@@ -7,10 +7,10 @@ export const DEFAULT_LOGIN_REDIRECT: string = "/dashboard";
 export const apiAuthPrefix: string = "/api/auth";
 
 // Routes which are accessible to all.
-export const publicRoutes: string[] = ["/", "/auth/verify-email","/updatingDB/"];
+export const publicRoutes: (string | RegExp)[] = ["/", "/auth/verify-email","/updatingDB/", /^\/verifyEmail\/[a-zA-Z0-9]+$/i ];
 
 // APIs which are accessible to all.
-export const publicApis: string[] = ["/api/uploadthing"];
+export const publicApis: string[] = ["/api/uploadthing","/api/emailVerification" , "/api/sendVerificationEmail" ];
 
 // Routes which are used for authentication.
 export const authRoutes: string[] = [
