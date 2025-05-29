@@ -14,8 +14,8 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import makePayments from "@/lib/makePayments";
 import { AiOutlineHeart, AiOutlineShoppingCart } from "react-icons/ai";
+import { useCourse } from "../../Context/CourseContext";
 // import Rewards from "./Rewards";
-import { useCourse } from "@/app/Context/CourseContext";
 
 const CourseContentPage: React.FC = () => {
   // courses part

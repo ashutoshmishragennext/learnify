@@ -3,7 +3,8 @@ import { ToastContainer } from "react-toastify";
 import localFont from "next/font/local";
 import "./globals.css";
 import { SessionProvider } from "next-auth/react";
-import { CourseProvider } from "./Context/CourseContext";
+import { CourseProvider } from "./(protected)/(Frontend)/Context/CourseContext";
+// import { CourseProvider } from "./Context/CourseContext";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",

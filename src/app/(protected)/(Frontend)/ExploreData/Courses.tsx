@@ -140,8 +140,8 @@
 import React, { useEffect, useState } from "react";
 import Card from "./Card";
 import Footer from "../Footer/page";
-import { ICourse } from "../models/Course";
 import { Session } from "next-auth";
+import { ICourse } from "@/app/models/Course";
 
 interface Course {
   id: number;

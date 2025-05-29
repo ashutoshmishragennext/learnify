@@ -1,8 +1,9 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Card from "./ExploreData/Card";
+// import Card from "./ExploreData/Card";
 import { ICourse } from "./models/Course";
 import { Session } from "next-auth";
+import Card from "./(protected)/(Frontend)/ExploreData/Card";
 
 const PopularCourses: React.FC<{ session?: Session | null }> = ({ session }) => {
   const [courses, setCourses] = useState<ICourse[]>([]); //course need to be an array only in this case.

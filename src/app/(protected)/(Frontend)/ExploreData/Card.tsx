@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import formatStudents from "@/lib/formatStudents";
 import { Session } from "next-auth";
-import { ICourse } from "../models/Course";
+import { ICourse } from "@/app/models/Course";
 
 interface CardProps {
   title: string;

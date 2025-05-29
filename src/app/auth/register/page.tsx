@@ -1,6 +1,6 @@
 "use client";
 
-import Signup from "@/app/signup/page";
+import Signup from "@/app/(protected)/(Frontend)/signup/page";
 import { Suspense } from "react";
 
 const Page = () => {

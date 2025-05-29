@@ -1,5 +1,5 @@
+import { auth } from "../../../../../auth";
 import Checkout from "../Checkout/Checkout";
-import { auth } from "../../../auth";
 
 const CheckoutPage = async() => {
   const session = await auth();

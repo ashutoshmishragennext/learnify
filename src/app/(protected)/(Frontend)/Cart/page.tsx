@@ -4,7 +4,7 @@ import React from 'react'
 import CartData from './CartData'
 import Footer from '../Footer/page'
 import Navbar from '@/components/ui/Navbar'
-import { auth } from '../../../auth'
+import { auth } from '../../../../../auth'
 
 
 const page = async () => {

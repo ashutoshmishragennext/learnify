@@ -1,12 +1,13 @@
 import React from 'react'
 import Navbar from '../components/ui/Navbar'
 import StatsBar from '@/components/StatsBar'
-import Footer from './Footer/page'
+// import Footer from './Footer/page'
 import BenefitsSection from './BenifitsSection'
 import PopularCourses from './PopularCourses'
 import Consist from './Consist'
 import dotenv from "dotenv";
 import { auth } from '../../auth';
+import Footer from './(protected)/(Frontend)/Footer/page'
 dotenv.config();
 
 const page = async () => {

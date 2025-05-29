@@ -2,7 +2,7 @@
 import React from "react";
 import Footer from "../../Footer/page";
 import Navbar from "@/components/ui/Navbar";
-import { auth } from "../../../../auth";
+import { auth } from "../../../../../../auth";
 import LectureScreen from "./Lecture";
 import { redirect, useParams } from "next/navigation";
 

@@ -6,8 +6,9 @@ import Consist from '@/app/Consist';
 import StatsBar from '@/components/StatsBar';
 import PopularCourses from '@/app/PopularCourses';
 import BenefitsSection from '@/app/BenifitsSection';
-import Footer from '@/app/Footer/page';
+// import Footer from '@/app/Footer/page';
 import { auth } from '../../../../../auth';
+import Footer from '../../(Frontend)/Footer/page';
 
 dotenv.config();
 

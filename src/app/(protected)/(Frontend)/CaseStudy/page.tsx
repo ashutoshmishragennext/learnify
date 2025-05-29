@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import CaseStudy from "@/app/CaseStudy/CaseStudyData";
+import CaseStudy from "./CaseStudyData";
 
 const CaseStudyData: React.FC = () => {
   const caseStudyData = {

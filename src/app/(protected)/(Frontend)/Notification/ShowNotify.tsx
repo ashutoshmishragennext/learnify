@@ -80,7 +80,7 @@
 "use client";
 
 import React, { useState } from "react";
-import Notification from "../Notification/Notification";
+import Notification from "./Notification";
 // import Sidebar from "../(protected)/dashboard/Sidebar";
 // import ProfileSection from "../(protected)/dashboard/ProfileSection";
 // import { useSession } from "next-auth/react";

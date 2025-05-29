@@ -1,8 +1,8 @@
 import React from 'react'
-import Courses from "@/app/ExploreData/Courses";
 import dotenv from "dotenv";
-import Navbar from '../../components/ui/Navbar';
-import { auth } from '../../../auth';
+import { auth } from '../../../../../auth';
+import Navbar from '@/components/ui/Navbar';
+import Courses from './Courses';
 dotenv.config();
 
 const page = async () => {
