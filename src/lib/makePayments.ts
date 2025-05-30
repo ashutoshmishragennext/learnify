@@ -39,7 +39,7 @@ interface RazorpayInstance {
 const makePayments = async (
   amount: number,
   courseName: string,
-  cId: number[] | number,      
+  cId: string[] | string,      
   session: Session | null | undefined,
   other?: string | undefined | null
   ) => {

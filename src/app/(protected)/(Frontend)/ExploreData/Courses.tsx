@@ -152,7 +152,7 @@ interface Course {
   originalPrice: number;
   description: string;
   dateRange?: string;
-  courseId: number;
+  courseId: string;
   category: string;
 }
 

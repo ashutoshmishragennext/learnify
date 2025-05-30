@@ -1,26 +1,26 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { toast } from "react-toastify";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { 
-  Loader2, 
-  Clock, 
-  BookOpen, 
-  DollarSign, 
-  Percent,
-  AlertCircle,
-  CheckCircle2
-} from "lucide-react";
 import { FormInstructions } from "@/components/FormIntruction";
 import ImageUpload from "@/components/ImageUpload";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  AlertCircle,
+  BookOpen,
+  CheckCircle2,
+  Clock,
+  DollarSign,
+  Loader2,
+  Percent
+} from "lucide-react";
+import React, { useState } from "react";
+import { toast } from "react-toastify";
 
 interface FormData {
   name: string;

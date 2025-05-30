@@ -20,7 +20,7 @@ interface CardProps {
   description:  any;
   buttonLabel: string;
   dateRange?: string;
-  courseId: number;
+  courseId: string;
 }
 
 const Card: React.FC<CardProps> = ({
@@ -48,7 +48,7 @@ const Card: React.FC<CardProps> = ({
         if (!response.ok) throw new Error("Error fetching wishlist courses");
 
         const wishlistData: ICourse[] = await response.json();
-        setIsInWishlist(wishlistData.some((course) => course.courseId === courseId));
+        setIsInWishlist(wishlistData.some((course) => course.courseId == courseId));
       } catch (error) {
         console.error("Error fetching wishlist:", error);
       }

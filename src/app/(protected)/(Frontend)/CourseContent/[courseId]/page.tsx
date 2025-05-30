@@ -163,7 +163,7 @@ const CourseContentPage: React.FC = () => {
   // Payments part
   const amount = course.price.current; // constant amount in INR
   const courseName = course.name;
-  const cId: number | number[] = Number(courseId);
+  const cId: string | string[] = String(courseId);
 
   const handlePayment = async () => {
     setIsProcessing(true);
@@ -300,7 +300,7 @@ const CourseContentPage: React.FC = () => {
         <section className="bg-light-blue text-center py-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-6xl mx-auto">
             <div>
-              <h3 className="text-4xl font-bold">{course.duration}</h3>
+              <h3 className="text-4xl font-bold">{course.duration.toFixed(2)}</h3>
               <p className="text-gray-300">Hours of Course</p>
             </div>
             <div>

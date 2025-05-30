@@ -153,7 +153,7 @@ export async function PUT(req: Request) {
     }
 
     // Update publisher if needed
-    let publisher = await Publisher.findOne({ email: session?.user?.email });
+    const publisher = await Publisher.findOne({ email: session?.user?.email });
     if (publisher) {
       // Update publisher details
       publisher.name = publisherName || publisher.name;

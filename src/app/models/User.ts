@@ -35,7 +35,7 @@ export interface IUser extends Document {
   githubId?: string;
   googleId?: string;
   // coursesBought?: ICourse[];
-  coursesBought?: String[];
+  coursesBought?: string[];
   cart?: number[];
   wishlist?: number[];
   reviews?: string[];

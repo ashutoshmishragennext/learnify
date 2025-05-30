@@ -57,6 +57,7 @@ const CoursePage: React.FC<CoursePageProps> = ({ course }) => {
     subtitle: "About Course",
     description: course.largeDescription?.intro,
     details: course.largeDescription?.subPoints || [],
+    syllabus : course.syllabus,
     features: allFeatures,
   };
 

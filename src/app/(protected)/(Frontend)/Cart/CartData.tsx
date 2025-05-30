@@ -19,14 +19,14 @@ interface ICourse {
   shortDescription: string;
   studentsEnrolled: number;
   price: { current: number; original: number };
-  courseId: number;
+  courseId: string; // Changed from number to string
 }
 
 const CartPage : React.FC<{ session?: Session | null }> = ({ session }) => {
   const [cart, setCart] = useState<ICourse[]>([]);
   const [loading, setLoading] = useState(true);
-  const [removingCourse, setRemovingCourse] = useState<number | null>(null);
-  const [processingCourse, setProcessingCourse] = useState<number | null>(null);
+  const [removingCourse, setRemovingCourse] = useState<string | null>(null); // Changed from number to string
+  const [processingCourse, setProcessingCourse] = useState<string | null>(null);
   const [isBuyingAll, setIsBuyingAll] = useState<boolean>(false);
   const router = useRouter();
 
@@ -49,7 +49,7 @@ const CartPage : React.FC<{ session?: Session | null }> = ({ session }) => {
   const handlePayment = async (
     amount: number,
     courseName: string,
-    courseId: number[] | number
+    courseId: string[] | string
   ) => {
     setProcessingCourse(Array.isArray(courseId) ? null : courseId);
     if (Array.isArray(courseId)) {
@@ -78,7 +78,7 @@ const CartPage : React.FC<{ session?: Session | null }> = ({ session }) => {
     }
   };
 
-  const handleRemove = async (courseId: number) => {
+  const handleRemove = async (courseId: string) => { // Changed parameter type from number to string
     try {
       setRemovingCourse(courseId);
       const response = await fetch("/api/removeCartCourse", {
@@ -130,7 +130,7 @@ const CartPage : React.FC<{ session?: Session | null }> = ({ session }) => {
                   onClick={() => handleRemove(item.courseId)}
                   className="absolute top-3 right-3 text-red-500 hover:text-red-700 transition w-6 h-6 flex items-center justify-center"
                 >
-                  {removingCourse === item.courseId ? (
+                  {removingCourse === item.courseId ? ( // Now both are strings, so comparison works
                     <ClipLoader size={20} color="red" />
                   ) : (
                     <TrashIcon className="w-6 h-6" />
@@ -176,11 +176,11 @@ const CartPage : React.FC<{ session?: Session | null }> = ({ session }) => {
                       )
                     }
                     className={`mt-3 px-5 py-2 text-white rounded-lg transition shadow-md ${
-                      processingCourse === item.courseId
+                      processingCourse === item.courseId // Now both are strings, so comparison works
                         ? "bg-gray-400 cursor-not-allowed"
                         : "bg-gradient-to-r from-purple-500 to-indigo-600  hover:bg-green-700"
                     }`}
-                    disabled={processingCourse === item.courseId}
+                    disabled={processingCourse === item.courseId} // Now both are strings, so comparison works
                   >
                     {processingCourse === item.courseId
                       ? "Processing..."
@@ -213,7 +213,7 @@ const CartPage : React.FC<{ session?: Session | null }> = ({ session }) => {
                 handlePayment(
                   totalAmount,
                   "Total Cart Payment",
-                  cart.map((course) => course.courseId)
+                  cart.map((course) => course.courseId) // Now returns string[], which matches the expected type
                 )
               }
               className="px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-600  text-white font-semibold rounded-lg hover:bg-blue-700 transition shadow-md"
