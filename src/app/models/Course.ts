@@ -165,6 +165,7 @@ export const CourseSchema: Schema = new Schema({
     default: uuidv4, 
   },  name: { type: String, },
   image: { type: String, },
+  userId : {type : String , required : true},
   courseHeading: {type: String},
   studentsEnrolled: { type: Number, default: 0 },
   shortDescription: { type: String,  },

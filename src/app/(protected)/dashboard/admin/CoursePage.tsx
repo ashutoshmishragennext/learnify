@@ -1,4 +1,5 @@
 "use client";
+import CourseIntroduction from "@/components/CourseIntroduction";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
@@ -42,49 +43,6 @@ const CoursePage: React.FC = () => {
       return null;
     }
   };
-
-  // const handleSave = async () => {
-  //   // console.log("Function started processing");
-  //   if (!videoFile || !pdfFile) {
-  //     toast.error("Please upload both Demo and Syllabus files!");
-  //     return;
-  //   }
-
-  //   const videoUrl = await uploadToCloudinary(videoFile);
-  //   const syllabusUrl = await uploadToCloudinary(pdfFile);
-
-  //   if (!videoUrl || !syllabusUrl) {
-  //     toast.error("Error uploading files!");
-  //     return;
-  //   }
-
-  //   const tagsArray = fieldValues.Tags?.split(/[\s,#]+/).filter(Boolean) || [];
-  //   const prerequisiteArray = fieldValues.Prerequisite?.split(/[,#]+/).filter(Boolean) || [];
-  //   const requirementArray = fieldValues.Requirement?.split(/[,#]+/).filter(Boolean) || [];
-  //   const subPointsArray = fieldValues.SubPoints?.split(/[,#]+/).filter(Boolean) || [];
-
-  //   const response = await fetch("/api/saveCourseIntro", {
-  //     method: "POST",
-  //     headers: { "Content-Type": "application/json" },
-  //     body: JSON.stringify({
-  //       ...fieldValues,
-  //       Demo: videoUrl,
-  //       Syllabus: syllabusUrl,
-  //       TagsArray: tagsArray,
-  //       PrerequisiteArray: prerequisiteArray,
-  //       RequirementArray: requirementArray,
-  //       SubPointsArray: subPointsArray,
-  //     }),
-  //   });
-
-  //   if (response.ok) {
-  //     const data = await response.json();
-  //     console.log(data);
-  //     toast.success(data.message);
-  //   } else {
-  //     toast.error("Failed to save data!");
-  //   }
-  // };
   const handleSave = async () => {
     setIsSaving(true); // Set saving state to true
 
@@ -162,116 +120,7 @@ const CoursePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
-      <div className="mb-6 p-4 bg-purple-100 border border-blue-300 rounded-lg">
-        <h2 className="text-lg font-bold text-blue-800 flex items-center">
-          <svg
-            className="w-5 h-5 mr-2 text-blue-600"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path
-              fillRule="evenodd"
-              d="M18 10A8 8 0 114 10a8 8 0 0114 0zm-9-3a1 1 0 112 0v4a1 1 0 11-2 0V7zm1 6a1 1 0 110 2 1 1 0 010-2z"
-              clipRule="evenodd"
-            />
-          </svg>
-          How to Fill Out This Page
-        </h2>
-        <p className="text-sm text-blue-700 mt-2">
-          This form helps you structure your course details. Fill in all the
-          required fields marked with{" "}
-          <span className="text-red-500 font-bold">*</span>.
-        </p>
-
-        <ul className="list-disc pl-5 mt-2 text-sm text-blue-700">
-          <li>
-            <strong>Demo:</strong> Upload a demo video to showcase a preview of
-            your course.
-          </li>
-          <li>
-            <strong>Course Heading:</strong> Provide the title of the course
-            that best describes its content.
-          </li>
-          <li>
-            <strong>Long Description:</strong> Write a detailed description
-            explaining the course&apos;s objectives and benefits.
-          </li>
-          <li>
-            <strong>SubPoints:</strong> Add key highlights or topics covered in
-            the course, (For multiple seperate by commas).
-          </li>
-          <li>
-            <strong>Category:</strong> Choose the appropriate category for the
-            course (e.g., Programming, Design). You can add multiple categories
-            if needed.
-          </li>
-          <li>
-            <strong>Certificate Provider:</strong> Select whether the course
-            provides a certificate upon completion.
-          </li>
-          <li>
-            <strong>Lifetime Access:</strong> Choose whether users will have
-            lifetime access to the course content.
-          </li>
-          <li>
-            <strong>Select Level:</strong> Indicate the difficulty level of the
-            course (e.g., Beginner, Intermediate, Advanced).
-          </li>
-          <li>
-            <strong>Tags:</strong> Enter keywords related to the course,
-            separated by spaces or commas, to improve searchability.
-          </li>
-          <li>
-            <strong>Prerequisite:</strong> Mention any knowledge or skills
-            required before taking the course, (For multiple seperate by commas).
-          </li>
-          <li>
-            <strong>Requirement:</strong> List any tools, software, or resources
-            needed for the course, (For multiple seperate by commas).
-          </li>
-          <li>
-            <strong>Publisher Name:</strong> Enter the name of the person or
-            organization publishing the course.
-          </li>
-          <li>
-            <strong>Publisher Bio:</strong> Provide a brief bio of the publisher
-            to introduce them to users.
-          </li>
-          <li>
-            <strong>Publisher Description:</strong> Write a detailed description
-            about the publisher and their expertise.
-          </li>
-          <li>
-            <strong>Publisher Profile Image:</strong> Upload an image for the
-            publisher&apos;s profile.
-          </li>
-          <li>
-            <strong>Subtitles:</strong> Specify if the course includes
-            subtitles.
-          </li>
-        </ul>
-
-        <h3 className="text-lg font-semibold mt-4">Course Details</h3>
-        <ul className="list-disc pl-5 mt-2 text-sm text-blue-700">
-          <li>
-            <strong>No. of Assignments:</strong> Enter the total number of
-            assignments available in the course.
-          </li>
-          <li>
-            <strong>No. of Video Lectures:</strong> Specify the total number of
-            video lectures included in the course.
-          </li>
-        </ul>
-
-        <h3 className="text-lg font-semibold mt-4">About Course</h3>
-        <ul className="list-disc pl-5 mt-2 text-sm text-blue-700">
-          <li>
-            <strong>Syllabus:</strong> Provide a structured syllabus outlining
-            the topics covered in the course.
-          </li>
-        </ul>
-      </div>
-
+      <CourseIntroduction/>
       {/* Combined Sections */}
       <DynamicSection
         title="Course Introduction"
@@ -321,15 +170,6 @@ const CoursePage: React.FC = () => {
         setRealCategories={setRealCategories}
       />
 
-      {/* Save Button */}
-      {/* <div className="flex justify-center mt-8">
-        <button
-          onClick={handleSave}
-          className="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg "
-        >
-          Save
-        </button>
-      </div> */}
       <div className="flex justify-center mt-8">
         <button
           onClick={handleSave}
@@ -376,17 +216,6 @@ const DynamicSection: React.FC<{
     setLocalCategories(categories);
   }, [categories]);
 
-  // const [categories, setCategories] = useState<string[]>([
-  //   "Programming",
-  //   "Web Development",
-  //   "Data Science",
-  //   "Cloud Computing",
-  //   "Cyber Security",
-  //   "Management",
-  //   "Design"
-  // ]);
-
-  // Default pre-filled values for fields
   const defaultValues: { [key: string]: string } = {
     Category: "Programming",
     "Select Level": "Beginner",
@@ -399,15 +228,12 @@ const DynamicSection: React.FC<{
   };
 
   useEffect(() => {
-    // Initialize the fieldValues with pre-filled values only once
     const initialValues = { ...defaultValues };
     initialFields.forEach((field) => {
       if (!initialValues[field]) {
         initialValues[field] = "";
       }
     });
-
-    // Set field values only once
     setFieldValues(initialValues);
   }, []); // The empty array ensures this effect runs only once when the component is mounted
 
@@ -451,7 +277,6 @@ const DynamicSection: React.FC<{
       [field]: value.toString(),
     }));
 
-    // Specific logic for fields like "Subtitles" and "Subtitles Language"
     if (field === "Subtitles") {
       if (value === "Yes") {
         if (!fields.includes("Subtitles Language")) {
@@ -470,22 +295,6 @@ const DynamicSection: React.FC<{
     }
   };
 
-  // const requiredFields: string[] = [
-  //   "Category",
-  //   "Select Level",
-  //   "Certificate Provider",
-  //   "Lifetime Access",
-  //   "Subtitles",
-  //   "Subtitles Language",
-  //   "Tags",
-  //   "Sub Points",
-  //   "No. of Assignments",
-  //   "No. of Video Lectures",
-  //   "Video Lectures",
-  //   "Syllabus",
-  //   "Publisher Profile Image",
-  //   "Demo",
-  // ];
 
   return (
     <div className="mb-6">
@@ -505,7 +314,6 @@ const DynamicSection: React.FC<{
   );
 };
 
-// Table that handles rendering each form field
 const Table: React.FC<{
   fields: string[];
   fieldValues: { [key: string]: string };
@@ -513,126 +321,6 @@ const Table: React.FC<{
   categories: string[];
   addCategory: () => void;
   handleFileUpload: (field: string, file: File) => void;
-
-  // }> = ({ fields, fieldValues, onInputChange, categories, addCategory, handleFileUpload }) => (
-  //   <table className="w-full border-collapse border border-gray-300">
-  //     <tbody>
-  //       {fields.map((field, index) => (
-  //         <tr key={index} className="border border-gray-300">
-  //           <td className="p-2 border-r border-gray-300">{field}</td>
-  //           <td className="p-2">
-  //             {field === "Category" ? (
-  //               <div className="flex items-center gap-2">
-  //                 <select
-  //                   value={fieldValues[field] || "Programming"}
-  //                   onChange={(e) => onInputChange(field, e.target.value)}
-  //                   className="w-full border p-1 rounded"
-  //                 >
-  //                   {categories.map((category, i) => (
-  //                     <option key={i} value={category}>
-  //                       {category}
-  //                     </option>
-  //                   ))}
-  //                 </select>
-  //                 <button
-  //                   onClick={addCategory}
-  //                   className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
-  //                 >
-  //                   + Add Category
-  //                 </button>
-  //               </div>
-  //             ) : field === "Select Level" ? (
-  //               <select
-  //                 value={fieldValues[field] || "Beginner"}
-  //                 onChange={(e) => onInputChange(field, e.target.value)}
-  //                 className="w-full border p-1 rounded"
-  //               >
-  //                 <option value="Beginner">Beginner</option>
-  //                 <option value="Intermediate">Intermediate</option>
-  //                 <option value="Advanced">Advanced</option>
-  //               </select>
-  //             ) : field === "Certificate Provider" ||
-  //               field === "Lifetime Access" ||
-  //               field === "Subtitles" ? (
-  //               <select
-  //                 value={fieldValues[field] || "No"}
-  //                 onChange={(e) => onInputChange(field, e.target.value)}
-  //                 className="w-full border p-1 rounded"
-  //               >
-  //                 <option value="Yes">Yes</option>
-  //                 <option value="No">No</option>
-  //               </select>
-  //             ) : field === "Subtitles Language" ? (
-  //               <select
-  //                 value={fieldValues[field] || "English"}
-  //                 onChange={(e) => onInputChange(field, e.target.value)}
-  //                 className="w-full border p-1 rounded"
-  //               >
-  //                 <option value="English">English</option>
-  //                 <option value="Hindi">Hindi</option>
-  //                 <option value="Both">Both</option>
-  //               </select>
-  //             ) : field === "Tags" || field === "Sub Points" ? (
-  //               <input
-  //                 type="text"
-  //                 value={fieldValues[field] || ""}
-  //                 onChange={(e) => onInputChange(field, e.target.value)}
-  //                 placeholder="Enter points by space or comma"
-  //                 className="w-full border p-1 rounded"
-  //               />
-  //             ) : field === "Video Lectures" ? (
-  //               <input
-  //               type="number"
-  //               value={fieldValues[field] || ""}
-  //               onChange={(e) => onInputChange(field, e.target.value)}
-  //               placeholder="Enter number of video lectures"
-  //               className="w-full border p-1 rounded"
-  //             />
-  //             ) : field === "Syllabus" ? (
-  //               <input
-  //                 type="file"
-  //                 accept="application/pdf"
-  //                 onChange={(e) => {
-  //                   const file = e.target.files?.[0];
-  //                   if (file) handleFileUpload(field, file);
-  //                 }}
-  //                 className="w-full border p-1 rounded"
-  //               />
-  //             ) : field === "Publisher Profile Image" ? (
-  //               <input
-  //                 type="file"
-  //                 accept="image/*"
-  //                 onChange={(e) => {
-  //                   const file = e.target.files?.[0];
-  //                   if (file) handleFileUpload(field, file);
-  //                 }}
-  //                 className="w-full border p-1 rounded"
-  //               />
-  //             ) : field === "Demo" ? (
-  //               <input
-  //                 type="file"
-  //                 accept="video/*"
-  //                 onChange={(e) => {
-  //                   const file = e.target.files?.[0];
-  //                   if (file) handleFileUpload(field, file);
-  //                 }}
-  //                 className="w-full border p-1 rounded"
-  //               />
-  //             ) : (
-  //               <input
-  //                 type="text"
-  //                 value={fieldValues[field] || ""}
-  //                 onChange={(e) => onInputChange(field, e.target.value)}
-  //                 className="w-full border p-1 rounded"
-  //               />
-  //             ) }
-  //           </td>
-
-  //         </tr>
-  //       ))}
-  //     </tbody>
-  //   </table>
-  // );
 }> = ({
   fields,
   fieldValues,
