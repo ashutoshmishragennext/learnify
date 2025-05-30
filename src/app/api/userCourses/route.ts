@@ -15,6 +15,9 @@ export async function GET() {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
+        console.log(session.user.id);
+        
+
         const user = await User.findOne({ _id: session.user.id });
         if (!user) {
             return NextResponse.json({ error: "User not found" }, { status: 404 });

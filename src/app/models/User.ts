@@ -15,7 +15,7 @@ export interface IModuleProgress {
 }
 
 export interface ICourseProgress {
-  courseId: number;
+  courseId: string;
   modules: IModuleProgress[];
   overallCompletionPercentage: number; // Calculated percentage
   completionStatus: boolean; // True if overallCompletionPercentage === 100
@@ -35,7 +35,7 @@ export interface IUser extends Document {
   githubId?: string;
   googleId?: string;
   // coursesBought?: ICourse[];
-  coursesBought?: number[];
+  coursesBought?: String[];
   cart?: number[];
   wishlist?: number[];
   reviews?: string[];
@@ -61,7 +61,7 @@ const ModuleProgressSchema: Schema = new Schema({
 });
 
 const CourseProgressSchema: Schema = new Schema({
-  courseId: { type: Number, required: true },
+  courseId: { type: String, required: true },
   modules: { type: [ModuleProgressSchema], required: true },
   overallCompletionPercentage: { type: Number, default: 0 },
   completionStatus: { type: Boolean, default: false },
@@ -93,7 +93,7 @@ const UserSchema: Schema = new Schema(
     githubId: { type: String, unique: true, sparse: true },
     googleId: { type: String, unique: true, sparse: true },
     coursesBought: {
-      type: [Number], // Embedding just the courseId
+      type: [String], // Embedding just the courseId
       default: [],
     },
     cart: {

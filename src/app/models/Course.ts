@@ -1,4 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import { v4 as uuidv4 } from 'uuid';
+
 
 // Interfaces for nested objects
 interface IAuthor {
@@ -63,7 +65,7 @@ interface ISubtitles {
 
 // Main interface for the Course document
 export interface ICourse extends Document {
-  courseId: number;
+  courseId: string;
   name: string;
   image: string;
   courseHeading: string;
@@ -157,8 +159,11 @@ const SubtitleSchema : Schema = new Schema({
 
 // Main Course schema
 export const CourseSchema: Schema = new Schema({
-  courseId: { type: Number, unique: true },
-  name: { type: String, },
+  courseId: {
+    type: String,
+    unique: true,
+    default: uuidv4, 
+  },  name: { type: String, },
   image: { type: String, },
   courseHeading: {type: String},
   studentsEnrolled: { type: Number, default: 0 },

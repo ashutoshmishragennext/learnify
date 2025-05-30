@@ -1,237 +1,26 @@
-// "use client";
-
-// import React, { useState } from "react";
-// import { toast } from "react-toastify";
-
-// interface SubField {
-//   id: number;
-//   name: string;
-//   type: string;
-//   placeholder: string;
-//   value?: string;
-// }
-
-// interface Field {
-//   id: number;
-//   name: string;
-//   type?: string;
-//   placeholder?: string;
-//   value?: string;
-//   subFields?: SubField[];
-// }
-
-// interface FormData {
-//   name: string;
-//   shortDescription: string;
-//   current: number;
-//   original: number;
-//   discountPercentage: number;
-//   duration: number;
-//   file: string;
-// }
-
-// const CardTemplateForm: React.FC = () => {
-//   const [imageFile, setImageFile] = useState<File | null>(null);
-//   const [formData, setFormData] = useState<Field[]>([
-//     { id: 1, name: "Hero IMG", type: "file", placeholder: "", value: "" },
-//     { id: 2, name: "Duration", type: "number", placeholder: "Enter Duration", value: "" },
-//     { id: 3, name: "Topic", type: "text", placeholder: "Enter Topic", value: "" },
-//     { id: 4, name: "Short Description", type: "text", placeholder: "Enter Description", value: "" },
-//     // Removed "Price" field but kept subfields
-//     {
-//       id: 5,
-//       name: "Pricing Details",
-//       subFields: [
-//         { id: 51, name: "Current Price", type: "number", placeholder: "Enter Current Price", value: "" },
-//         { id: 52, name: "Original Price", type: "number", placeholder: "Enter Original Price", value: "" },
-//         { id: 53, name: "Discount Percentage", type: "number", placeholder: "Enter Discount %", value: "" },
-//       ],
-//     },
-//   ]);
-
-//   // Handle input change
-//   const handleChange = (id: number, value: string, isSubField: boolean = false, parentId?: number) => {
-//     setFormData((prevData) =>
-//       prevData.map((field) => {
-//         if (isSubField && field.subFields && field.id === parentId) {
-//           return {
-//             ...field,
-//             subFields: field.subFields.map((subField) =>
-//               subField.id === id ? { ...subField, value } : subField
-//             ),
-//           };
-//         } else if (field.id === id) {
-//           return { ...field, value };
-//         }
-//         return field;
-//       })
-//     );
-//   };
-
-//   // Handle file upload
-//   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-//     const file = event.target.files?.[0];
-//     if (file && file.type.startsWith("image/")) {
-//       setImageFile(file);
-//     } else {
-//       toast.error("Please upload a valid image file");
-//     }
-//   };
-
-//   // Extract real form data before submission
-//   const extractRealFormData = async (): Promise<FormData | null> => {
-//     const name = formData.find((f) => f.name === "Topic")?.value || "";
-//     const shortDescription = formData.find((f) => f.name === "Short Description")?.value || "";
-//     const duration = Number(formData.find((f) => f.name === "Duration")?.value) || 0;
-
-//     // Extract price subfields
-//     const priceField = formData.find((f) => f.name === "Pricing Details");
-//     const current = Number(priceField?.subFields?.find((f) => f.name === "Current Price")?.value) || 0;
-//     const original = Number(priceField?.subFields?.find((f) => f.name === "Original Price")?.value) || 0;
-//     const discountPercentage = Number(priceField?.subFields?.find((f) => f.name === "Discount Percentage")?.value) || 0;
-
-//     if (!name || !shortDescription || !duration || !current || !original || !imageFile) {
-//       toast.error("Please fill all required fields.");
-//       return null;
-//     }
-
-//     // Convert image file to Base64
-//     const fileBase64 = await convertFileToBase64(imageFile);
-
-//     return {
-//       name,
-//       shortDescription,
-//       current,
-//       original,
-//       discountPercentage,
-//       duration,
-//       file: fileBase64, // Base64 encoded image
-//     };
-//   };
-
-//   // Convert file to Base64
-//   const convertFileToBase64 = (file: File): Promise<string> => {
-//     return new Promise((resolve, reject) => {
-//       const reader = new FileReader();
-//       reader.readAsDataURL(file);
-//       reader.onload = () => resolve(reader.result as string);
-//       reader.onerror = (error) => reject(error);
-//     });
-//   };
-
-//   // Submit form data
-//   const handleSubmit = async () => {
-//     const realFormData = await extractRealFormData();
-//     if (!realFormData) return;
-
-//     try {
-//       const response = await fetch("/api/saveCardTemplate", {
-//         method: "POST",
-//         headers: {
-//           "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify(realFormData),
-//       });
-
-//       const data = await response.json();
-//       console.log("Response:", data);
-//       toast.success("Data saved successfully");
-//     } catch (error) {
-//       console.error("Error:", error);
-//       toast.error("Failed to save the data");
-//     }
-//   };
-
-//   return (
-//     <div className="bg-white shadow-md p-6 rounded-lg">
-//       <table className="w-full text-left border-collapse border border-gray-200 mb-4">
-//         <thead>
-//           <tr>
-//             <th className="p-2 border border-gray-200">Field Name</th>
-//             <th className="p-2 border border-gray-200">Input</th>
-//           </tr>
-//         </thead>
-//         <tbody>
-//           {formData.map((field) => (
-//             <React.Fragment key={field.id}>
-//               <tr>
-//                 <td className="p-2 border border-gray-200">{field.name}</td>
-//                 <td className="p-2 border border-gray-200">
-//                   {field.type === "file" ? (
-//                     <input
-//                       type="file"
-//                       className="border p-2 rounded w-full"
-//                       onChange={handleFileChange}
-//                     />
-//                   ) : field.type ? (
-//                     <input
-//                       type={field.type}
-//                       placeholder={field.placeholder}
-//                       value={field.value || ""}
-//                       className="border p-2 rounded w-full"
-//                       onChange={(e) => handleChange(field.id, e.target.value)}
-//                     />
-//                   ) : null}
-//                 </td>
-//               </tr>
-//               {field.subFields &&
-//                 field.subFields.map((subField) => (
-//                   <tr key={subField.id}>
-//                     <td className="pl-6 p-2 border border-gray-200 text-gray-600">
-//                       ├─ {subField.name}
-//                     </td>
-//                     <td className="p-2 border border-gray-200">
-//                       <input
-//                         type={subField.type}
-//                         placeholder={subField.placeholder}
-//                         value={subField.value || ""}
-//                         className="border p-2 rounded w-full"
-//                         onChange={(e) => handleChange(subField.id, e.target.value, true, field.id)}
-//                       />
-//                     </td>
-//                   </tr>
-//                 ))}
-//             </React.Fragment>
-//           ))}
-//         </tbody>
-//       </table>
-
-//       <div className="flex justify-end">
-//         <button
-//           onClick={handleSubmit}
-//           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-//         >
-//           Save
-//         </button>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default CardTemplateForm;
-
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
-
-interface SubField {
-  id: number;
-  name: string;
-  type: string;
-  placeholder: string;
-  value?: string;
-  disabled?: boolean;
-}
-
-interface Field {
-  id: number;
-  name: string;
-  type?: string;
-  placeholder?: string;
-  value?: string;
-  subFields?: SubField[];
-}
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { 
+  Loader2, 
+  Clock, 
+  BookOpen, 
+  DollarSign, 
+  Percent,
+  AlertCircle,
+  CheckCircle2
+} from "lucide-react";
+import { FormInstructions } from "@/components/FormIntruction";
+import ImageUpload from "@/components/ImageUpload";
 
 interface FormData {
   name: string;
@@ -240,183 +29,118 @@ interface FormData {
   original: number;
   discountPercentage: number;
   duration: number;
-  file: string;
+  imageUrl: string;
+}
+
+interface FormErrors {
+  name?: string;
+  shortDescription?: string;
+  duration?: string;
+  current?: string;
+  original?: string;
+  imageUrl?: string;
 }
 
 const CardTemplateForm: React.FC = () => {
-  const [imageFile, setImageFile] = useState<File | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [formData, setFormData] = useState<Field[]>([
-    { id: 1, name: "Hero IMG", type: "file", placeholder: "", value: "" },
-    {
-      id: 2,
-      name: "Duration",
-      type: "number",
-      placeholder: "Enter Duration in minutes for complete course",
-      value: "",
-    },
-    {
-      id: 3,
-      name: "Topic",
-      type: "text",
-      placeholder: "Enter Topic",
-      value: "",
-    },
-    {
-      id: 4,
-      name: "Short Description",
-      type: "text",
-      placeholder: "Enter Description",
-      value: "",
-    },
-    {
-      id: 5,
-      name: "Pricing Details",
-      subFields: [
-        {
-          id: 51,
-          name: "Current Price",
-          type: "number",
-          placeholder: "Enter Current Price",
-          value: "",
-        },
-        {
-          id: 52,
-          name: "Original Price",
-          type: "number",
-          placeholder: "Enter Original Price",
-          value: "",
-        },
-        {
-          id: 53,
-          name: "Discount Percentage",
-          type: "number",
-          placeholder:
-            "Enter Current Price for automatic disocount calculation: ",
-          disabled: true,
-        },
-      ],
-    },
-  ]);
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [formData, setFormData] = useState({
+    name: "",
+    shortDescription: "",
+    duration: "",
+    current: "",
+    original: "",
+    imageUrl: "",
+  });
 
-  // Handle input change
-  const handleChange = (
-    id: number,
-    value: string,
-    isSubField: boolean = false,
-    parentId?: number
-  ) => {
-    setFormData((prevData) =>
-      prevData.map((field) => {
-        if (isSubField && field.subFields && field.id === parentId) {
-          const updatedSubFields = field.subFields.map((subField) =>
-            subField.id === id ? { ...subField, value } : subField
-          );
-
-          // Automatically calculate discount if both prices are provided
-          const currentPrice =
-            Number(updatedSubFields.find((f) => f.id === 51)?.value) || 0;
-          const originalPrice =
-            Number(updatedSubFields.find((f) => f.id === 52)?.value) || 0;
-
-          if (
-            currentPrice > 0 &&
-            originalPrice > 0 &&
-            originalPrice > currentPrice
-          ) {
-            const discount =
-              ((originalPrice - currentPrice) / originalPrice) * 100;
-            updatedSubFields.find((f) => f.id === 53)!.value =
-              discount.toFixed(2);
-          } else {
-            updatedSubFields.find((f) => f.id === 53)!.value = "";
-          }
-
-          return { ...field, subFields: updatedSubFields };
-        } else if (field.id === id) {
-          return { ...field, value };
-        }
-        return field;
-      })
-    );
-  };
-
-  // Handle file upload
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file && file.type.startsWith("image/")) {
-      setImageFile(file);
-    } else {
-      toast.error("Please upload a valid image file");
-    }
-  };
-
-  // Extract real form data before submission
-  const extractRealFormData = async (): Promise<FormData | null> => {
-    const name = formData.find((f) => f.name === "Topic")?.value || "";
-    const shortDescription =
-      formData.find((f) => f.name === "Short Description")?.value || "";
-    const duration = 
-      (Number(formData.find((f) => f.name === "Duration")?.value) || 0) / 60;
+  // Calculate discount percentage automatically
+  const discountPercentage = React.useMemo(() => {
+    const current = parseFloat(formData.current) || 0;
+    const original = parseFloat(formData.original) || 0;
     
-    // Extract price subfields
-    const priceField = formData.find((f) => f.name === "Pricing Details");
-    const current =
-      Number(
-        priceField?.subFields?.find((f) => f.name === "Current Price")?.value
-      ) || 0;
-    const original =
-      Number(
-        priceField?.subFields?.find((f) => f.name === "Original Price")?.value
-      ) || 0;
-    const discountPercentage = Math.round(
-      Number(
-        priceField?.subFields?.find((f) => f.name === "Discount Percentage")
-          ?.value
-      ) || 0
-    );
+    if (current > 0 && original > 0 && original > current) {
+      return Math.round(((original - current) / original) * 100);
+    }
+    return 0;
+  }, [formData.current, formData.original]);
 
-    if (
-      !name ||
-      !shortDescription ||
-      !duration ||
-      !current ||
-      !original ||
-      !imageFile
-    ) {
-      toast.error("Please fill all required fields.");
-      return null;
+  // Validation function
+  const validateForm = (): FormErrors => {
+    const newErrors: FormErrors = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = "Course topic is required";
     }
 
-    // Convert image file to Base64
-    const fileBase64 = await convertFileToBase64(imageFile);
+    if (!formData.shortDescription.trim()) {
+      newErrors.shortDescription = "Description is required";
+    } else if (formData.shortDescription.length < 10) {
+      newErrors.shortDescription = "Description must be at least 10 characters";
+    }
 
-    return {
-      name,
-      shortDescription,
-      current,
-      original,
-      discountPercentage,
-      duration,
-      file: fileBase64,
-    };
+    const duration = parseFloat(formData.duration);
+    if (!formData.duration || duration <= 0) {
+      newErrors.duration = "Duration must be greater than 0";
+    }
+
+    const current = parseFloat(formData.current);
+    if (!formData.current || current <= 0) {
+      newErrors.current = "Current price must be greater than 0";
+    }
+
+    const original = parseFloat(formData.original);
+    if (!formData.original || original <= 0) {
+      newErrors.original = "Original price must be greater than 0";
+    } else if (original <= current) {
+      newErrors.original = "Original price must be greater than current price";
+    }
+
+    if (!formData.imageUrl) {
+      newErrors.imageUrl = "Hero image is required";
+    }
+
+    return newErrors;
   };
 
-  // Convert file to Base64
-  const convertFileToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = (error) => reject(error);
-    });
+  // Handle input changes
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    
+    // Clear error when user starts typing
+    if (errors[field as keyof FormErrors]) {
+      setErrors(prev => ({ ...prev, [field]: undefined }));
+    }
   };
 
-  // Submit form data
+  // Handle image upload
+  const handleImageUpload = (imageUrl: string) => {
+    setFormData(prev => ({ ...prev, imageUrl }));
+    if (errors.imageUrl) {
+      setErrors(prev => ({ ...prev, imageUrl: undefined }));
+    }
+  };
+
+  // Submit form
   const handleSubmit = async () => {
-    setIsSaving(true); // Set saving state to true
-    const realFormData = await extractRealFormData();
-    if (!realFormData) return;
+    const validationErrors = validateForm();
+    
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      toast.error("Please fix all errors before submitting");
+      return;
+    }
+
+    setIsSaving(true);
+
+    const submitData: FormData = {
+      name: formData.name.trim(),
+      shortDescription: formData.shortDescription.trim(),
+      current: parseFloat(formData.current),
+      original: parseFloat(formData.original),
+      discountPercentage,
+      duration: parseFloat(formData.duration) / 60, // Convert to hours
+      imageUrl: formData.imageUrl,
+    };
 
     try {
       const response = await fetch("/api/saveCardTemplate", {
@@ -424,164 +148,270 @@ const CardTemplateForm: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(realFormData),
+        body: JSON.stringify(submitData),
       });
 
       const data = await response.json();
-      console.log("Response:", data);
-      toast.success("Data saved successfully");
+      
+      if (response.ok) {
+        toast.success("Course card saved successfully!");
+        // Reset form
+        setFormData({
+          name: "",
+          shortDescription: "",
+          duration: "",
+          current: "",
+          original: "",
+          imageUrl: "",
+        });
+        setErrors({});
+      } else {
+        throw new Error(data.error || "Failed to save");
+      }
     } catch (error) {
-      console.error("Error:", error);
-      toast.error("Failed to save the data");
+      console.error("Submit error:", error);
+      toast.error("Failed to save the course card. Please try again.");
     } finally {
-      setIsSaving(false); // Reset saving state after operation
+      setIsSaving(false);
     }
   };
 
+  const isFormValid = Object.keys(validateForm()).length === 0;
+
   return (
-    <div className="bg-white shadow-md p-6 rounded-lg">
-      {/* Info Section */}
-      <div className="mb-6 p-4 bg-purple-100 border border-blue-300 rounded-lg">
-        <h2 className="text-lg font-bold text-blue-800 flex items-center">
-          <svg
-            className="w-5 h-5 mr-2 text-blue-600"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path
-              fillRule="evenodd"
-              d="M18 10A8 8 0 114 10a8 8 0 0114 0zm-9-3a1 1 0 112 0v4a1 1 0 11-2 0V7zm1 6a1 1 0 110 2 1 1 0 010-2z"
-              clipRule="evenodd"
+    <div className="max-w-6xl mx-auto p-6 space-y-6">
+      <FormInstructions />
+      
+      <Card className="shadow-lg border-0 bg-gradient-to-br from-white to-gray-50">
+        <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-lg">
+          <CardTitle className="text-2xl font-bold flex items-center gap-2">
+            <BookOpen className="w-6 h-6" />
+            Course Card Template Form
+          </CardTitle>
+        </CardHeader>
+        
+        <CardContent className="p-8 space-y-8">
+          {/* Hero Image Upload */}
+          <div className="space-y-3">
+            <Label className="text-lg font-semibold flex items-center gap-2">
+              Course Image <span className="text-red-500">*</span>
+            </Label>
+            <ImageUpload 
+              onImageUpload={handleImageUpload}
+              currentImageUrl={formData.imageUrl}
+              disabled={isSaving}
             />
-          </svg>
-          How to Fill Out This Page
-        </h2>
-        <p className="text-sm text-blue-700 mt-2">
-          This form helps you structure your course card. Fill in all the
-          required fields marked with{" "}
-          <span className="text-red-500 font-bold">*</span>.
-        </p>
+            {errors.imageUrl && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{errors.imageUrl}</AlertDescription>
+              </Alert>
+            )}
+          </div>
 
-        <ul className="list-disc pl-5 mt-2 text-sm text-blue-700">
-          <li>
-            <strong>Hero Image:</strong> Upload an image that represents your
-            course. This image will be used as the course card image visible to
-            users.
-          </li>
-          <li>
-            <strong>Duration:</strong> Enter the total duration of the course in
-            minutes.
-          </li>
-          <li>
-            <strong>Topic:</strong> Specify the main subject of the course.
-          </li>
-          <li>
-            <strong>Short Description:</strong> Provide a brief description of
-            the course to give users an overview.
-          </li>
-          <li>
-            <strong>Pricing Details:</strong>
-            <ul className="list-disc pl-5">
-              <li>
-                <strong>Current Price:</strong> Enter the price at which the
-                course is currently being sold.
-              </li>
-              <li>
-                <strong>Original Price:</strong> Enter the original price before
-                any discount.
-              </li>
-              <li>
-                <strong>Discount Percentage:</strong> This will be
-                auto-calculated based on the original and current price.
-              </li>
-            </ul>
-          </li>
-        </ul>
-      </div>
+          <Separator />
 
-      <table className="w-full text-left border-collapse border border-gray-200 mb-4">
-        <thead>
-          <tr>
-            <th className="p-2 border border-gray-200">Field Name</th>
-            <th className="p-2 border border-gray-200">Input</th>
-          </tr>
-        </thead>
-        <tbody>
-          {formData.map((field) => (
-            <React.Fragment key={field.id}>
-              <tr>
-                <td className="p-2 border border-gray-200">
-                  {field.name} <span className="text-red-500">*</span>
-                </td>
-                <td className="p-2 border border-gray-200">
-                  {field.type === "file" ? (
-                    <input
-                      type="file"
-                      className="border p-2 rounded w-full"
-                      onChange={handleFileChange}
-                    />
-                  ) : field.type ? (
-                    <input
-                      type={field.type}
-                      placeholder={field.placeholder}
-                      value={field.value || ""}
-                      className="border p-2 rounded w-full"
-                      onChange={(e) => handleChange(field.id, e.target.value)}
-                    />
-                  ) : null}
-                </td>
-              </tr>
-              {field.subFields &&
-                field.subFields.map((subField) => (
-                  <tr key={subField.id}>
-                    <td className="pl-6 p-2 border border-gray-200 text-gray-600">
-                      ├─ {subField.name}
-                    </td>
-                    <td className="p-2 border border-gray-200">
-                      <input
-                        type={subField.type}
-                        placeholder={subField.placeholder}
-                        value={subField.value || ""}
-                        className="border p-2 rounded w-full"
-                        disabled={subField.id === 53}
-                        onChange={(e) =>
-                          handleChange(
-                            subField.id,
-                            e.target.value,
-                            true,
-                            field.id
-                          )
-                        }
-                      />
-                    </td>
-                  </tr>
-                ))}
-            </React.Fragment>
-          ))}
-        </tbody>
-      </table>
+          {/* Course Details */}
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Course Topic */}
+            <div className="space-y-3">
+              <Label htmlFor="name" className="text-lg font-semibold flex items-center gap-2">
+                <BookOpen className="w-4 h-4" />
+                Course Topic <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="name"
+                type="text"
+                placeholder="e.g., Advanced React Development"
+                value={formData.name}
+                onChange={(e) => handleInputChange("name", e.target.value)}
+                className={`h-12 ${errors.name ? "border-red-500" : ""}`}
+                disabled={isSaving}
+              />
+              {errors.name && (
+                <p className="text-sm text-red-500 flex items-center gap-1">
+                  <AlertCircle className="w-4 h-4" />
+                  {errors.name}
+                </p>
+              )}
+            </div>
 
-      {/* <div className="flex justify-end">
-              <button
-         onClick={handleSubmit}
-         className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-       >
-          Save
-        </button>
-      </div> */}
-      <div className="flex justify-center mt-8">
-        <button
-          onClick={handleSubmit}
-          disabled={isSaving}
-          className={`px-6 py-3 font-bold rounded-md text-white ${
-            isSaving
-              ? "bg-green-800 cursor-not-allowed"
-              : "bg-gradient-to-r from-green-500 to-green-600 hover:bg-green-600"
-          }`}
-        >
-          {isSaving ? "Saving..." : "Save"}
-        </button>
-      </div>
+            {/* Duration */}
+            <div className="space-y-3">
+              <Label htmlFor="duration" className="text-lg font-semibold flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                Duration (minutes) <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="duration"
+                type="number"
+                placeholder="e.g., 180"
+                value={formData.duration}
+                onChange={(e) => handleInputChange("duration", e.target.value)}
+                className={`h-12 ${errors.duration ? "border-red-500" : ""}`}
+                disabled={isSaving}
+                min="1"
+              />
+              {errors.duration && (
+                <p className="text-sm text-red-500 flex items-center gap-1">
+                  <AlertCircle className="w-4 h-4" />
+                  {errors.duration}
+                </p>
+              )}
+              {formData.duration && parseFloat(formData.duration) > 0 && (
+                <p className="text-sm text-green-600 flex items-center gap-1">
+                  <CheckCircle2 className="w-4 h-4" />
+                  ≈ {(parseFloat(formData.duration) / 60).toFixed(1)} hours
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Course Description */}
+          <div className="space-y-3">
+            <Label htmlFor="description" className="text-lg font-semibold">
+              Course Description <span className="text-red-500">*</span>
+            </Label>
+            <Textarea
+              id="description"
+              placeholder="Provide a detailed description of what students will learn in this course..."
+              value={formData.shortDescription}
+              onChange={(e) => handleInputChange("shortDescription", e.target.value)}
+              className={`min-h-[120px] resize-none ${errors.shortDescription ? "border-red-500" : ""}`}
+              disabled={isSaving}
+            />
+            <div className="flex justify-between items-center">
+              {errors.shortDescription ? (
+                <p className="text-sm text-red-500 flex items-center gap-1">
+                  <AlertCircle className="w-4 h-4" />
+                  {errors.shortDescription}
+                </p>
+              ) : (
+                <p className="text-sm text-gray-500">
+                  {formData.shortDescription.length}/500 characters
+                </p>
+              )}
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Pricing Section */}
+          <div className="space-y-6">
+            <div className="flex items-center gap-2">
+              <DollarSign className="w-5 h-5 text-green-600" />
+              <h3 className="text-xl font-bold text-gray-800">Pricing Details</h3>
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Current Price */}
+              <div className="space-y-3">
+                <Label htmlFor="current" className="font-semibold flex items-center gap-2">
+                  Current Price <span className="text-red-500">*</span>
+                </Label>
+                <div className="relative">
+                  <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input
+                    id="current"
+                    type="number"
+                    placeholder="99.99"
+                    value={formData.current}
+                    onChange={(e) => handleInputChange("current", e.target.value)}
+                    className={`h-12 pl-10 ${errors.current ? "border-red-500" : ""}`}
+                    disabled={isSaving}
+                    min="0.01"
+                    step="0.01"
+                  />
+                </div>
+                {errors.current && (
+                  <p className="text-sm text-red-500 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.current}
+                  </p>
+                )}
+              </div>
+
+              {/* Original Price */}
+              <div className="space-y-3">
+                <Label htmlFor="original" className="font-semibold flex items-center gap-2">
+                  Original Price <span className="text-red-500">*</span>
+                </Label>
+                <div className="relative">
+                  <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input
+                    id="original"
+                    type="number"
+                    placeholder="199.99"
+                    value={formData.original}
+                    onChange={(e) => handleInputChange("original", e.target.value)}
+                    className={`h-12 pl-10 ${errors.original ? "border-red-500" : ""}`}
+                    disabled={isSaving}
+                    min="0.01"
+                    step="0.01"
+                  />
+                </div>
+                {errors.original && (
+                  <p className="text-sm text-red-500 flex items-center gap-1">
+                    <AlertCircle className="w-4 h-4" />
+                    {errors.original}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Discount Display */}
+            {discountPercentage > 0 && (
+              <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Percent className="w-5 h-5 text-green-600" />
+                      <span className="font-semibold text-green-800">Discount Calculated</span>
+                    </div>
+                    <Badge variant="secondary" className="bg-green-100 text-green-800 text-lg px-3 py-1">
+                      {discountPercentage}% OFF
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-green-700 mt-2">
+                    Students save ₹{(parseFloat(formData.original) - parseFloat(formData.current)).toFixed(2)}
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
+          {/* Submit Button */}
+          <div className="flex justify-center pt-6">
+            <Button
+              onClick={handleSubmit}
+              disabled={isSaving || !isFormValid}
+              className="px-12 py-4 text-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg transform transition-all duration-200 hover:scale-105"
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-3 animate-spin" />
+                  Saving Course...
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 className="w-5 h-5 mr-3" />
+                  Save Course Card
+                </>
+              )}
+            </Button>
+          </div>
+
+          {/* Form Status */}
+          {!isFormValid && (
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                Please fill in all required fields to enable submission.
+              </AlertDescription>
+            </Alert>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };

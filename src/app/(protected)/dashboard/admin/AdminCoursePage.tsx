@@ -57,7 +57,7 @@ const AdminCoursePage: React.FC = () => {
         {/* Tab Content */}
         {activeTabIndex === 0 && (
           <div>
-            <h2 className="text-2xl font-bold text-purple-700 mb-4">Course Card Template</h2>
+            <h2 className="text-2xl font-bold text-purple-700 mb-4 text-center">Course Card Template</h2>
             <CardTemplateForm /> {/* Render the CardTemplateForm component */}
           </div>
         )}

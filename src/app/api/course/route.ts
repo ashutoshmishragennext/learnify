@@ -11,6 +11,8 @@ export async function POST(req: NextRequest) {
 
   // const { courseId } = await params;  
 
+  console.log(courseId);
+  
   try {
     await connectDB(); // Ensure the database connection
     const course = await Course.findOne({ courseId });
@@ -50,4 +52,15 @@ export async function POST(req: NextRequest) {
     console.error(error);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
   }
+}
+
+export async function GET(req: NextRequest) {
+    const course = await Course.findOne()
+  return NextResponse.json(
+      {
+        course,
+        courseIncluded: false, // User not logged in, so assume not purchased
+      },
+      { status: 200 }
+    );
 }

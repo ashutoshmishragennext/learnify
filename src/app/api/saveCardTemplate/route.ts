@@ -1,28 +1,19 @@
     import { NextResponse } from "next/server";
     import connectDB from "@/lib/dbConnect"; 
     import Course from "@/app/models/Course"; 
-    import cloudinary from "@/lib/cloudinary";
 
     export async function POST(req: Request) {
     try {
         await connectDB();
 
-        // calculating new courseId;
-        const courseId:number = await Course.countDocuments()+1;
-
         const data = await req.json();
 
-        const { name, shortDescription, original, current, duration, file, discountPercentage } = data;
+        const { name, shortDescription, original, current, duration, imageUrl, discountPercentage } = data;
 
-        // // Upload the image to Cloudinary
-        const uploadResponse = await cloudinary.uploader.upload(file);
-        const imageUrl = uploadResponse.secure_url;
-        // console.log(imageUrl);
 
 
         // Create a new course entry
         const newCourse = new Course({
-            courseId,
             name,
             image: imageUrl,
             shortDescription,
