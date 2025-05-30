@@ -28,6 +28,7 @@ import CourseIntroduction from "@/components/CourseIntroduction";
 import ImageUpload from "@/components/ImageUpload"; // Your existing ImageUpload component
 
 interface Course {
+  courseId : string;
   _id: string;
   name: string;
   shortDescription: string;
@@ -84,8 +85,13 @@ const FileUpload: React.FC<FileUploadProps> = ({
     const file = event.target.files?.[0];
     if (!file) return;
 
+    console.log("file type",file.type ,      acceptedTypes.split('/').some(type => 
+      file.type.includes(type.trim()) || file.name.toLowerCase().includes(type.trim())
+    )
+);
+    
     // Validate file type
-    const isValidType = acceptedTypes.split(',').some(type => 
+    const isValidType = acceptedTypes.split('/').some(type => 
       file.type.includes(type.trim()) || file.name.toLowerCase().includes(type.trim())
     );
     
@@ -256,6 +262,8 @@ const CoursePage: React.FC = () => {
   // Handle course selection
   const handleCourseSelect = (courseId: string) => {
     setSelectedCourseId(courseId);
+    console.log(courseId);
+    
     setFormData(prev => ({ ...prev, courseId }));
     
     // Try to fetch existing course intro data
@@ -380,13 +388,13 @@ const CoursePage: React.FC = () => {
             ) : (
               <div className="space-y-4">
                 <Label className="text-lg font-semibold">Choose a course:</Label>
-                <Select value={selectedCourseId} onValueChange={handleCourseSelect}>
+                <Select value={selectedCourseId} onValueChange={handleCourseSelect }>
                   <SelectTrigger className="h-12">
                     <SelectValue placeholder="Select a course to add introduction details" />
                   </SelectTrigger>
                   <SelectContent>
                     {courses.map((course) => (
-                      <SelectItem key={course._id} value={course._id}>
+                      <SelectItem key={course.courseId} value={course.courseId}>
                         <div className="flex items-center gap-3">
                           <img 
                             src={course.image} 
@@ -450,7 +458,7 @@ const CoursePage: React.FC = () => {
                   </div>
 
                   <div className="space-y-3">
-                    <Label className="font-semibold flex items-center gap-2">
+                    <Label className="font-semibold flex items-center gap-2 mt-2">
                       Level <span className="text-red-500">*</span>
                     </Label>
                     <Select 
