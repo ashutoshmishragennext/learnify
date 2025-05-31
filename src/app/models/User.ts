@@ -97,11 +97,11 @@ const UserSchema: Schema = new Schema(
       default: [],
     },
     cart: {
-      type: [Number],
+      type: [String],
       default: [],
     },
     wishlist: {
-      type: [Number],
+      type: [String],
       default: [],
     },
     reviews: { type: [String], default: [] },
