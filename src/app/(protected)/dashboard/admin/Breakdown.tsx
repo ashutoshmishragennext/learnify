@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
+import { MdViewModule } from "react-icons/md";
+import { AiFillProduct } from "react-icons/ai";
 
 // Define types for module fields and internal details
 interface InternalDetail {
@@ -304,12 +306,12 @@ const Breakdown: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="grid max-w-screen-xl mx-auto">
       <h1 className="text-2xl font-bold text-purple-700 mb-6">
         Course Breakdown
       </h1>
       {/* Info Section */}
-      <div className="mb-6 p-4 bg-purple-100 border border-blue-300 rounded-lg">
+      <div className="mb-6  p-4  bg-purple-100 border border-blue-300 rounded-3xl">
         <h2 className="text-lg font-bold text-blue-800 flex items-center">
           <svg
             className="w-5 h-5 mr-2 text-blue-600"
@@ -381,29 +383,29 @@ const Breakdown: React.FC = () => {
       </div>
 
       {moduleFields.map((field, moduleIndex) => (
-        <div key={moduleIndex} className="mb-8 border p-4 rounded-md">
+        <div key={moduleIndex} className="mb-8 border-[1px] border-gray-400 p-4 rounded-lg">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-purple-700">
-              Module {moduleIndex + 1}
+            <h2 className="flex items-center gap-2 text-lg font-semibold text-purple-700">
+            <MdViewModule/>  Module {moduleIndex + 1}
             </h2>
             <FaTrash
               className="text-red-500 cursor-pointer hover:text-red-700"
               onClick={() => deleteModule(moduleIndex)}
             />
           </div>
-          <table className="w-full border border-gray-300">
-            <tbody>
+          <table className="w-2/3 mx-auto mt-4 border border-gray-300 rounded-3xl">
+            <tbody className="" >
               {["number", "topic", "parts", "reward"].map((key) => (
-                <tr key={key}>
+                <tr key={key} >
                   <td className="px-4 py-2 bg-gray-100 font-semibold text-purple-700">
                     {key} <span className="text-red-500">*</span>
                   </td>
-                  <td className="px-4 py-2">
+                  <td className="px-4 py-2 ">
                     <input
                       type={key === "topic" ? "text" : "number"}
                       value={field[key as keyof ModuleField] as string | number}
                       placeholder={`Enter ${key}`}
-                      className="w-full px-2 py-1 border border-gray-300 rounded-md"
+                      className="w-full max-w-lg px-2 py-2 border bg-slate-100 border-gray-300 rounded-lg hover:border-gray-400 outline-none"
                       onChange={(e) =>
                         handleModuleInputChange(
                           moduleIndex,
@@ -425,7 +427,7 @@ const Breakdown: React.FC = () => {
                     type="number"
                     placeholder="Hrs"
                     value={field.duration.hours || ""}
-                    className="w-16 px-2 py-1 border border-gray-300 rounded-md"
+                    className="w-16 px-2 py-1 border border-gray-300 hover:border-gray-300 rounded-md outline-none"
                     onChange={(e) =>
                       handleModuleDurationChange(
                         moduleIndex,
@@ -438,7 +440,7 @@ const Breakdown: React.FC = () => {
                     type="number"
                     placeholder="Min"
                     value={field.duration.minutes || ""}
-                    className="w-16 px-2 py-1 border border-gray-300 rounded-md"
+                    className="w-16 px-2 py-1 border border-gray-300 hover:border-gray-300 rounded-md outline-none"
                     onChange={(e) =>
                       handleModuleDurationChange(
                         moduleIndex,
@@ -451,7 +453,7 @@ const Breakdown: React.FC = () => {
                     type="number"
                     placeholder="Secs"
                     value={field.duration.seconds || ""}
-                    className="w-16 px-2 py-1 border border-gray-300 rounded-md"
+                    className="w-16 px-2 py-1 border border-gray-300 hover:border-gray-300 rounded-md outline-none"
                     onChange={(e) =>
                       handleModuleDurationChange(
                         moduleIndex,
@@ -465,20 +467,23 @@ const Breakdown: React.FC = () => {
             </tbody>
           </table>
 
-          <div className="mt-6">
+          <div className="mt-6 w-2/3 rounded-md mx-auto">
             <h2 className="text-lg font-semibold text-purple-700 mb-4">
-              Sub Modules
+              <AiFillProduct className="inline-block" /> Sub Modules
             </h2>
-            <table className="w-full border border-gray-300 mb-4">
+            <table className="border border-gray-300 mb-4 ">
               <thead className="bg-gray-100">
-                <tr>
+                <tr className="">
                   {["partNumber", "partName", "duration", "videoLecture"].map(
                     (heading) => (
                       <th
                         key={heading}
                         className="px-4 py-2 text-left font-semibold text-purple-700"
                       >
-                        {heading} <span className="text-red-500">*</span>
+                        <div className="inline-flex">
+
+                      {heading} <pre className="text-red-500"> *</pre>
+                        </div>
                       </th>
                     )
                   )}
@@ -486,8 +491,8 @@ const Breakdown: React.FC = () => {
               </thead>
               <tbody>
                 {field.subModules.map((row, subIndex) => (
-                  <tr key={subIndex}>
-                    <td className="px-4 py-2">
+                  <tr key={subIndex} className="">
+                    <thead className="px-4 py-2">
                       <input
                         type="number"
                         placeholder="Part Number"
@@ -502,7 +507,7 @@ const Breakdown: React.FC = () => {
                           )
                         }
                       />
-                    </td>
+                    </thead>
                     <td className="px-4 py-2">
                       <input
                         type="text"
@@ -520,7 +525,7 @@ const Breakdown: React.FC = () => {
                       />
                     </td>
                     {/* Duration Fields for Sub Modules */}
-                    <td className="px-4 py-2 flex space-x-2">
+                    <td className="px-4 py-2 flex  space-x-2">
                       <input
                         type="number"
                         placeholder="Min"
