@@ -166,20 +166,27 @@ const CourseContentPage: React.FC = () => {
   const cId: string | string[] = String(courseId);
 
   const handlePayment = async () => {
-    setIsProcessing(true);
-
-    if (!session) {
-      setCourseData(course);
-      router.push("/Checkout");
-    } else {
-      const result = await makePayments(amount, courseName, cId, session);
-      if (result) {
-        setCourseIncluded(true);
-        toast.info("Redirecting you to Dashboard");
-        router.push("/DashBoard");
+    try {
+      setIsProcessing(true);
+  
+      if (!session) {
+        setCourseData(course);
+        router.push("/");
       } else {
-        setIsProcessing(false);
+        const result = await makePayments(amount, courseName, cId, session);
+        console.log("result" ,result);
+        
+        if (result) {
+          setCourseIncluded(true);
+          toast.info("Redirecting you to Your Courses");
+          router.push("/dashboard/student/courses");
+        }
       }
+    } catch (error : any) {
+        toast.error(error.message);
+    }
+    finally {
+      setIsProcessing(false);
     }
   };
 

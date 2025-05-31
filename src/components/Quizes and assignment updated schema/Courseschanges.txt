@@ -1,0 +1,68 @@
+interface IQuizQuestion {
+  id: number;
+  question: string;
+  options: string[];
+  correctAnswerIndex: number;
+}
+
+interface IQuiz {
+  questions: IQuizQuestion[];
+  totalScore: number;
+}
+
+interface IAssignment {
+  title: string;
+  instructions: string;
+  pdfLink: string; // Link to the assignment file
+  dueDate: Date;
+}
+
+
+
+
+
+
+
+
+interface ISubmodule {
+  sModuleNumber: number;
+  sModuleTitle: string;
+  sModuleDuration: number;
+  videoLecture: string;
+  quiz?: IQuiz;
+  assignment?: IAssignment;
+}
+
+
+
+
+const QuizQuestionSchema: Schema = new Schema({
+  id: Number,
+  question: String,
+  options: [String],
+  correctAnswerIndex: Number,
+});
+
+const QuizSchema: Schema = new Schema({
+  questions: [QuizQuestionSchema],
+  totalScore: { type: Number, default: 0 },
+});
+
+const AssignmentSchema: Schema = new Schema({
+  title: { type: String },
+  instructions: { type: String },
+  pdfLink: { type: String },
+  dueDate: { type: Date },
+});
+
+const SubmoduleSchema: Schema = new Schema({
+  sModuleNumber: Number,
+  sModuleTitle: String,
+  sModuleDuration: Number,
+  videoLecture: String,
+  quiz: { type: QuizSchema, required: false },
+  assignment: { type: AssignmentSchema, required: false },
+});
+
+
+

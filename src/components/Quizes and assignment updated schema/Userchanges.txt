@@ -1,0 +1,47 @@
+interface IAssignmentSubmission {
+  pdfUrl: string;
+  submittedAt: Date;
+  graded?: boolean;
+  score?: number;
+}
+
+interface IQuizAttempt {
+  score: number;
+  attemptedAt: Date;
+}
+
+export interface ISubmoduleProgress {
+  submoduleId: number;
+  completed: boolean;
+  quizAttempt?: IQuizAttempt;
+  assignmentSubmission?: IAssignmentSubmission;
+}
+
+
+
+
+
+
+
+
+
+
+
+const QuizAttemptSchema: Schema = new Schema({
+  score: { type: Number },
+  attemptedAt: { type: Date, default: Date.now },
+});
+
+const AssignmentSubmissionSchema: Schema = new Schema({
+  pdfUrl: { type: String },
+  submittedAt: { type: Date, default: Date.now },
+  graded: { type: Boolean, default: false },
+  score: { type: Number },
+});
+
+const SubmoduleProgressSchema: Schema = new Schema({
+  submoduleId: { type: Number, required: true },
+  completed: { type: Boolean, default: false },
+  quizAttempt: { type: QuizAttemptSchema, required: false },
+  assignmentSubmission: { type: AssignmentSubmissionSchema, required: false },
+});

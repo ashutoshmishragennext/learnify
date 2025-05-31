@@ -130,7 +130,7 @@ const makePayments = async (
   
             toast.success("Payment Successful for all Cart Courses!", { autoClose: 5000 });
             resolve(true);
-        } else if (typeof cId === "number") {
+        } else if (typeof cId === "string") {
 
           const resp = await fetch("/api/buyCourse", {
             method: "POST",
