@@ -26,17 +26,65 @@ import {
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-
+// Updated Course interface to match API response structure
 interface Course {
-  courseId : string;
+  courseId: string;
   _id: string;
+  current : string;
   name: string;
-  shortDescription: string;
-  current: number;
-  original: number;
-  duration: number;
   image: string;
-  createdAt: string;
+  userId: string;
+  studentsEnrolled: number;
+  shortDescription: string;
+  price: {
+    current: number;
+    original: number;
+    discountPercentage: number;
+    _id: string;
+  };
+  duration: number;
+  requirements: string[];
+  prerequisites: string[];
+  tags: string[];
+  lastUpdated: string;
+  authors: {
+    name: string;
+    bio: string;
+    description: string;
+    profileImage: string;
+    _id: string;
+  }[];
+  modules: any[];
+  reviews: any[];
+  subtitles: {
+    available: string;
+    language: string;
+    _id: string;
+  }[];
+  mediaContent: {
+    type: string;
+    url: string;
+    _id: string;
+  }[];
+  __v: number;
+  category: string;
+  certificate: string;
+  courseHeading: string;
+  largeDescription: {
+    intro: string;
+    subPoints: string[];
+    _id: string;
+  };
+  level: string;
+  lifeTimeAccess: string;
+  ratings: {
+    average: number;
+    totalRatings: number;
+    _id: string;
+  };
+  syllabus: string;
+  totalAssignments: number;
+  totalVideoLectures: number;
 }
 
 interface FormData {
@@ -48,7 +96,7 @@ interface FormData {
   category: string;
   certificateProvider: boolean;
   lifetimeAccess: boolean;
-  level: "Beginner" | "Intermediate" | "Advanced";
+  level: "Beginner" | "Intermediate" | "Advanced" | string;
   tags: string[];
   prerequisite: string[];
   requirement: string[];
@@ -57,7 +105,7 @@ interface FormData {
   publisherDescription: string;
   publisherProfileImage: string;
   subtitles: boolean;
-  subtitlesLanguage: "English" | "Hindi" | "Both";
+  subtitlesLanguage: "English" | "Hindi" | "Both" | string;
   numberOfAssignments: number;
   numberOfVideoLectures: number;
   syllabus: string;
@@ -184,7 +232,7 @@ const CoursePage: React.FC = () => {
     courseHeading: "",
     longDescription: "",
     subPoints: [],
-    category: "Programming",
+    category: "WEB",
     certificateProvider: false,
     lifetimeAccess: false,
     level: "Beginner",
@@ -236,21 +284,53 @@ const CoursePage: React.FC = () => {
   // Fetch course introduction data if it exists
   const fetchCourseIntroData = async (courseId: string) => {
     try {
-      const response = await fetch(`/api/getCourseIntro/${courseId}`);
-      if (response.ok) {
-        const data = await response.json();
-        if (data.courseIntro) {
-          // Prefill form with existing data
-          setFormData(prev => ({
-            ...prev,
-            ...data.courseIntro,
-            courseId: courseId,
-          }));
-          toast.success("Course data loaded successfully!");
-        }
-      }
+      // const response = await fetch(`/api/getCourseIntro/${courseId}`);
+      // if (response.ok) {
+      //   const data = await response.json();
+      //   if (data.courseIntro) {
+      //     // Prefill form with existing data
+      //     setFormData(prev => ({
+      //       ...prev,
+      //       ...data.courseIntro,
+      //       courseId: courseId,
+      //     }));
+      //     toast.success("Course data loaded successfully!");
+      //   }
+      // }
+
+      const course = courses.find(c => c.courseId === courseId);
+  
+  if (!course) {
+    console.error('Course not found with courseId:', courseId);
+    return;
+  }
+
+  // Map API response to formData structure
+  setFormData({
+    courseId: course.courseId || "",
+    demo: course.mediaContent?.[0]?.url || "", // Taking first media content as demo
+    courseHeading: course.courseHeading || "",
+    longDescription: course.largeDescription?.intro || "",
+    subPoints: course.largeDescription?.subPoints || [],
+    category: course.category || "WEB",
+    certificateProvider: course.certificate === "true",
+    lifetimeAccess: course.lifeTimeAccess === "true",
+    level: course.level || "Beginner",
+    tags: course.tags || [],
+    prerequisite: course.prerequisites || [],
+    requirement: course.requirements || [],
+    publisherName: course.authors?.[0]?.name || "",
+    publisherBio: course.authors?.[0]?.bio || "",
+    publisherDescription: course.authors?.[0]?.description || "",
+    publisherProfileImage: course.authors?.[0]?.profileImage || "",
+    subtitles: course.subtitles?.[0]?.available === "true",
+    subtitlesLanguage: course.subtitles?.[0]?.language || "English",
+    numberOfAssignments: course.totalAssignments || 0,
+    numberOfVideoLectures: course.totalVideoLectures || 0,
+    syllabus: course.syllabus || "",
+  });
     } catch (error) {
-      console.error("Error fetching course intro data:", error);
+      console.error("Error selecting course intro data:", error);
     }
   };
 
@@ -279,7 +359,7 @@ const CoursePage: React.FC = () => {
 
   // Handle array inputs (tags, prerequisites, etc.)
   const handleArrayInput = (field: keyof FormData, value: string) => {
-    const arrayValue = value.split(/[\s,#]+/).filter(Boolean);
+    const arrayValue = value.split(',').filter(Boolean);
     setFormData(prev => ({ ...prev, [field]: arrayValue }));
   };
 
