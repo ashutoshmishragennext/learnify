@@ -205,7 +205,7 @@ const Login = () => {
                 </label>
                 <Link
                   onClick={handleLoader}
-                  href="/ForgetPassword"
+                  href="/Password/ForgetPassword"
                   className="text-purple-600 hover:underline text-sm"
                 >
                   {loader ? <Loader /> : "Forgot Password?"}
