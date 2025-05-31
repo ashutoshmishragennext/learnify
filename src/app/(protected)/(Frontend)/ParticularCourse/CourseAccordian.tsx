@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaPlay } from "react-icons/fa";
 
 
@@ -94,6 +94,13 @@ interface CourseAccordionProps {
 
 const CourseAccordion: React.FC<CourseAccordionProps> = ({ courseId }) => {
   const [openModule, setOpenModule] = useState<number | null>(null);
+  const [data , setData] = useState(null);
+
+  useEffect(() => {
+    if(courseId) {
+      
+    }
+  },[courseId])
 
   const toggleModule = (id: number) => {
     setOpenModule((prev) => (prev === id ? null : id));

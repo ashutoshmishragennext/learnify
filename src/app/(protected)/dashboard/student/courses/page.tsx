@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 // import Footer from "../Footer/page";
 import { Session } from "next-auth";
 import { ICourse } from "@/app/models/Course";
-import { useSession } from "next-auth/react";
+// import { useSession } from "next-auth/react";
 import Footer from "@/app/(protected)/(Frontend)/Footer/page";
 import CardRedirectForBuyCourses from "@/app/(protected)/(Frontend)/ExploreData/CardRedirectForBuyCourses";
 
