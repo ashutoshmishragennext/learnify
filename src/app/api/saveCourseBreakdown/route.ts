@@ -3,55 +3,74 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/dbConnect";
 import Course from "@/app/models/Course";
+import { auth } from "../../../../auth";
 
 export async function POST(req: Request) {
+  const session = await auth();
+  
   try {
     await connectDB();
 
-    // Getting the last updated course
-    const courseId: number = await Course.countDocuments();
-    const rewardsArray: number[] = []; // Changed from let to const
-
     const data = await req.json();
-    // console.log("Data received from frontend inside the backend: ", data);
+    const courseId = data.courseId;
 
-    // Extract modules and transform to match schema
-    const modules = data.map((module: any) => {
-      const reward = Number(module.reward);
+    // Validate required data
+    if (!courseId) {
+      return NextResponse.json({ error: "Course ID is required" }, { status: 400 });
+    }
+
+    if (!data.modules || !Array.isArray(data.modules)) {
+      return NextResponse.json({ error: "Modules data is required and must be an array" }, { status: 400 });
+    }
+
+    // Check if course exists
+    const existingCourse = await Course.findOne({ courseId: courseId });
+    if (!existingCourse) {
+      return NextResponse.json({ error: "Course not found" }, { status: 404 });
+    }
+
+    const rewardsArray: number[] = [];
+    let totalDuration = 0;
+
+    // Transform modules data to match schema
+    const modules = data.modules.map((module: any, index: number) => {
+      const reward = Number(module.reward) || 0;
+      const moduleDuration = Number(module.duration) || 0;
+      
       rewardsArray.push(reward);
+      totalDuration += moduleDuration;
+
+      // Transform sub-modules
+      const subModules = (module.subModules || []).map((sub: any) => ({
+        sModuleNumber: Number(sub.partNumber) || 0,
+        sModuleTitle: sub.partName || '',
+        sModuleDuration: Number(sub.duration) || 0,
+        videoLecture: sub.videoLecture || '',
+      }));
 
       return {
-        moduleNumber: Number(module.number),
-        moduleTitle: module.topic,
-        moduleDuration: Number(module.duration),
-        subModulePart: Number(module.parts),
-        reward,
-        subModules: module.subModules.map((sub: any) => ({
-          sModuleNumber: Number(sub.partNumber),
-          sModuleTitle: sub.partName,
-          sModuleDuration: Number(sub.duration),
-          videoLecture: sub.videoLecture,
-        })),
+        moduleNumber: index + 1, // Ensure sequential numbering
+        moduleTitle: module.topic || '',
+        moduleDuration: moduleDuration,
+        subModulePart: Number(module.parts) || subModules.length,
+        reward: reward,
+        subModules: subModules,
       };
     });
 
-    // console.log("CourseId:", courseId, "modules after destructuring:", modules);
-    // console.log("Rewards Array:", rewardsArray);
+    // Calculate total rewards
+    const totalReward = rewardsArray.reduce((acc, curr) => acc + curr, 0);
 
-    // sum up all rewards and storing in one.
-    const sumOfRewards: number = rewardsArray.reduce( // Changed from let to const
-      (acc, curr) => acc + curr,
-      0
-    );
-
-    const course = await Course.findOneAndUpdate(
+    // Update the course with modules and calculated values
+    const updatedCourse = await Course.findOneAndUpdate(
       { courseId: courseId },
       {
         $set: {
-          modules,
+          modules: modules,
+          duration: totalDuration,
           rewards: {
             moduleRewards: rewardsArray,
-            totalReward: sumOfRewards,
+            totalReward: totalReward,
           },
           lastUpdated: new Date(),
         },
@@ -59,16 +78,254 @@ export async function POST(req: Request) {
       { new: true }
     );
 
+    if (!updatedCourse) {
+      return NextResponse.json({ error: "Failed to update course" }, { status: 500 });
+    }
+
+    return NextResponse.json(
+      { 
+        message: "Course modules updated successfully",
+        course: {
+          courseId: updatedCourse.courseId,
+          totalModules: modules.length,
+          totalDuration: totalDuration,
+          totalReward: totalReward,
+        }
+      },
+      { status: 200 }
+    );
+
+  } catch (error) {
+    console.error("Error updating course modules:", error);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
+}
+
+export async function PUT(req: Request) {
+  const session = await auth();
+  
+  try {
+    await connectDB();
+
+    const data = await req.json();
+    const courseId = data.courseId;
+
+    // Validate required data
+    if (!courseId) {
+      return NextResponse.json({ error: "Course ID is required" }, { status: 400 });
+    }
+
+    // Check if course exists
+    const existingCourse = await Course.findOne({ courseId: courseId });
+    if (!existingCourse) {
+      return NextResponse.json({ error: "Course not found" }, { status: 404 });
+    }
+
+    const updateData: any = {
+      lastUpdated: new Date(),
+    };
+
+    // Update modules if provided
+    if (data.modules && Array.isArray(data.modules)) {
+      const rewardsArray: number[] = [];
+      let totalDuration = 0;
+
+      const modules = data.modules.map((module: any, index: number) => {
+        const reward = Number(module.reward) || 0;
+        const moduleDuration = Number(module.duration) || 0;
+        
+        rewardsArray.push(reward);
+        totalDuration += moduleDuration;
+
+        const subModules = (module.subModules || []).map((sub: any) => ({
+          sModuleNumber: Number(sub.partNumber) || 0,
+          sModuleTitle: sub.partName || '',
+          sModuleDuration: Number(sub.duration) || 0,
+          videoLecture: sub.videoLecture || '',
+        }));
+
+        return {
+          moduleNumber: index + 1,
+          moduleTitle: module.topic || '',
+          moduleDuration: moduleDuration,
+          subModulePart: Number(module.parts) || subModules.length,
+          reward: reward,
+          subModules: subModules,
+        };
+      });
+
+      const totalReward = rewardsArray.reduce((acc, curr) => acc + curr, 0);
+
+      updateData.modules = modules;
+      updateData.duration = totalDuration;
+      updateData.rewards = {
+        moduleRewards: rewardsArray,
+        totalReward: totalReward,
+      };
+    }
+
+    // Update individual module if provided
+    if (data.moduleNumber && data.moduleUpdate) {
+      const moduleNumber = Number(data.moduleNumber);
+      const moduleUpdate = data.moduleUpdate;
+      
+      // Find and update specific module
+      const course = await Course.findOne({ courseId: courseId });
+      if (course && course.modules) {
+        const moduleIndex = course.modules.findIndex((m:any) => m.moduleNumber === moduleNumber);
+        if (moduleIndex !== -1) {
+          // Update specific fields of the module
+          if (moduleUpdate.moduleTitle) course.modules[moduleIndex].moduleTitle = moduleUpdate.moduleTitle;
+          if (moduleUpdate.moduleDuration) course.modules[moduleIndex].moduleDuration = Number(moduleUpdate.moduleDuration);
+          if (moduleUpdate.reward) course.modules[moduleIndex].reward = Number(moduleUpdate.reward);
+          if (moduleUpdate.subModules) course.modules[moduleIndex].subModules = moduleUpdate.subModules;
+
+          updateData.modules = course.modules;
+          
+          // Recalculate rewards and duration
+          const newRewardsArray = course.modules.map((m:any) => m.reward);
+          const newTotalDuration = course.modules.reduce((acc:any, m:any) => acc + m.moduleDuration, 0);
+          const newTotalReward = newRewardsArray.reduce((acc:any, curr:any) => acc + curr, 0);
+          
+          updateData.duration = newTotalDuration;
+          updateData.rewards = {
+            moduleRewards: newRewardsArray,
+            totalReward: newTotalReward,
+          };
+        }
+      }
+    }
+
+    const updatedCourse = await Course.findOneAndUpdate(
+      { courseId: courseId },
+      { $set: updateData },
+      { new: true }
+    );
+
+    return NextResponse.json(
+      { 
+        message: "Course updated successfully",
+        course: {
+          courseId: updatedCourse.courseId,
+          totalModules: updatedCourse.modules?.length || 0,
+          totalDuration: updatedCourse.duration || 0,
+          totalReward: updatedCourse.rewards?.totalReward || 0,
+        }
+      },
+      { status: 200 }
+    );
+
+  } catch (error) {
+    console.error("Error updating course:", error);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
+}
+
+export async function GET(req: Request) {
+  try {
+    await connectDB();
+
+    const { searchParams } = new URL(req.url);
+    const courseId = searchParams.get('courseId');
+
+    if (!courseId) {
+      return NextResponse.json({ error: "Course ID is required" }, { status: 400 });
+    }
+
+    const course = await Course.findOne({ courseId: courseId }).select('modules rewards duration');
+    
     if (!course) {
       return NextResponse.json({ error: "Course not found" }, { status: 404 });
     }
 
     return NextResponse.json(
-      { message: "Course modules updated successfully" },
-      { status: 201 }
+      { 
+        courseId: course.courseId,
+        modules: course.modules,
+        rewards: course.rewards,
+        duration: course.duration,
+      },
+      { status: 200 }
     );
+
   } catch (error) {
-    console.error("Error updating course modules:", error);
+    console.error("Error fetching course modules:", error);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: Request) {
+  const session = await auth();
+  
+  try {
+    await connectDB();
+
+    const { searchParams } = new URL(req.url);
+    const courseId = searchParams.get('courseId');
+    const moduleNumber = searchParams.get('moduleNumber');
+
+    if (!courseId) {
+      return NextResponse.json({ error: "Course ID is required" }, { status: 400 });
+    }
+
+    if (!moduleNumber) {
+      return NextResponse.json({ error: "Module number is required" }, { status: 400 });
+    }
+
+    const course = await Course.findOne({ courseId: courseId });
+    if (!course) {
+      return NextResponse.json({ error: "Course not found" }, { status: 404 });
+    }
+
+    // Remove the specific module
+    const moduleIndex = course.modules.findIndex((m:any) => m.moduleNumber === Number(moduleNumber));
+    if (moduleIndex === -1) {
+      return NextResponse.json({ error: "Module not found" }, { status: 404 });
+    }
+
+    course.modules.splice(moduleIndex, 1);
+
+    // Renumber remaining modules
+    course.modules.forEach((module:any, index:number) => {
+      module.moduleNumber = index + 1;
+    });
+
+    // Recalculate rewards and duration
+    const newRewardsArray = course.modules.map((m:any) => m.reward);
+    const newTotalDuration = course.modules.reduce((acc:any, m:any) => acc + m.moduleDuration, 0);
+    const newTotalReward = newRewardsArray.reduce((acc:any, curr:any) => acc + curr, 0);
+
+    const updatedCourse = await Course.findOneAndUpdate(
+      { courseId: courseId },
+      {
+        $set: {
+          modules: course.modules,
+          duration: newTotalDuration,
+          rewards: {
+            moduleRewards: newRewardsArray,
+            totalReward: newTotalReward,
+          },
+          lastUpdated: new Date(),
+        },
+      },
+      { new: true }
+    );
+
+    return NextResponse.json(
+      { 
+        message: "Module deleted successfully",
+        course: {
+          courseId: updatedCourse.courseId,
+          totalModules: updatedCourse.modules?.length || 0,
+          totalDuration: updatedCourse.duration || 0,
+          totalReward: updatedCourse.rewards?.totalReward || 0,
+        }
+      },
+      { status: 200 }
+    );
+
+  } catch (error) {
+    console.error("Error deleting module:", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

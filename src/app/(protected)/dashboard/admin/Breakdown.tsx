@@ -1,10 +1,27 @@
-"use client";
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { MdViewModule } from "react-icons/md";
 import { AiFillProduct } from "react-icons/ai";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import {
+  AlertCircle,
+  Book,
+  CheckCircle2,
+  Loader2,
+  Plus,
+  Video,
+  Clock,
+  Award,
+  FileVideo,
+  Trash2
+} from "lucide-react";
 
 // Define types for module fields and internal details
 interface InternalDetail {
@@ -23,7 +40,72 @@ interface ModuleField {
   subModules: InternalDetail[];
 }
 
+interface Course {
+  courseId: string;
+  _id: string;
+  current: string;
+  name: string;
+  image: string;
+  userId: string;
+  studentsEnrolled: number;
+  shortDescription: string;
+  price: {
+    current: number;
+    original: number;
+    discountPercentage: number;
+    _id: string;
+  };
+  duration: number;
+  requirements: string[];
+  prerequisites: string[];
+  tags: string[];
+  lastUpdated: string;
+  authors: {
+    name: string;
+    bio: string;
+    description: string;
+    profileImage: string;
+    _id: string;
+  }[];
+  modules: any[];
+  reviews: any[];
+  subtitles: {
+    available: string;
+    language: string;
+    _id: string;
+  }[];
+  mediaContent: {
+    type: string;
+    url: string;
+    _id: string;
+  }[];
+  __v: number;
+  category: string;
+  certificate: string;
+  courseHeading: string;
+  largeDescription: {
+    intro: string;
+    subPoints: string[];
+    _id: string;
+  };
+  level: string;
+  lifeTimeAccess: string;
+  ratings: {
+    average: number;
+    totalRatings: number;
+    _id: string;
+  };
+  syllabus: string;
+  totalAssignments: number;
+  totalVideoLectures: number;
+}
+
 const Breakdown: React.FC = () => {
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [selectedCourseId, setSelectedCourseId] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  
   const [moduleFields, setModuleFields] = useState<ModuleField[]>([
     {
       number: 1,
@@ -42,9 +124,50 @@ const Breakdown: React.FC = () => {
     },
   ]);
 
-  const addModuleField = () => {
+  // Fetch user's courses
+  const fetchUserCourses = async () => {
+    try {
+      const response = await fetch("/api/getcoursecreatedbyuser");
+      if (response.ok) {
+        const data = await response.json();
+        setCourses(data.course || []);
+      } else {
+        toast.error("Failed to fetch your courses");
+      }
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+      toast.error("Error loading your courses");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Fetch existing breakdown data if available
+  const fetchCourseBreakdown = async (courseId: string) => {
+    try {
+      const response = await fetch(`/api/getCourseBreakdown/${courseId}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.breakdown && data.breakdown.length > 0) {
+          setModuleFields(data.breakdown);
+          toast.success("Course breakdown loaded successfully!");
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching course breakdown:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserCourses();
+  }, []);
+
+  // Handle course selection
+  const handleCourseSelect = (courseId: string) => {
+    setSelectedCourseId(courseId);
+    
+    // Reset module fields to default when switching courses
     setModuleFields([
-      ...moduleFields,
       {
         number: 1,
         topic: "",
@@ -61,11 +184,39 @@ const Breakdown: React.FC = () => {
         ],
       },
     ]);
+    
+    // Try to fetch existing breakdown data
+    if (courseId) {
+      fetchCourseBreakdown(courseId);
+    }
   };
 
-  const [isSaving, setIsSaving] = useState(false);
+  const addModuleField = () => {
+    setModuleFields([
+      ...moduleFields,
+      {
+        number: moduleFields.length + 1,
+        topic: "",
+        parts: 1,
+        duration: { hours: 0, minutes: 0, seconds: 0 },
+        reward: 1,
+        subModules: [
+          {
+            partNumber: 1,
+            partName: "",
+            duration: { minutes: 0, seconds: 0 },
+            videoLecture: null,
+          },
+        ],
+      },
+    ]);
+  };
 
   const deleteModule = (index: number) => {
+    if (moduleFields.length === 1) {
+      toast.error("At least one module is required");
+      return;
+    }
     setModuleFields(moduleFields.filter((_, i) => i !== index));
   };
 
@@ -86,7 +237,7 @@ const Breakdown: React.FC = () => {
     setModuleFields((prevFields) =>
       prevFields.map((module, i) =>
         i === moduleIndex
-          ? module.subModules.length < module.parts // Check if adding another submodule is allowed
+          ? module.subModules.length < module.parts
             ? {
                 ...module,
                 subModules: [
@@ -99,13 +250,12 @@ const Breakdown: React.FC = () => {
                   },
                 ],
               }
-            : module // If limit is reached, return the same module without modification
+            : module
           : module
       )
     );
   };
 
-  // Ensure the number of subModules does not exceed 'parts' when updating the 'parts' field
   const handleModuleInputChange = (
     index: number,
     field: keyof ModuleField,
@@ -120,7 +270,6 @@ const Breakdown: React.FC = () => {
           [field]: field === "topic" ? value.toString() : Number(value),
         };
 
-        // If the 'parts' value decreases, remove extra submodules
         if (field === "parts") {
           const partsValue = Number(value);
           if (partsValue < module.subModules.length) {
@@ -188,33 +337,51 @@ const Breakdown: React.FC = () => {
   };
 
   const handleSave = async () => {
-    setIsSaving(true); // Set saving state to true
+    if (!selectedCourseId) {
+      toast.error("Please select a course first");
+      return;
+    }
+
+    // Validate required fields
+    const hasEmptyFields = moduleFields.some(module => 
+      !module.topic || 
+      module.subModules.some(sub => !sub.partName)
+    );
+
+    if (hasEmptyFields) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    setIsSaving(true);
     console.log("Complete object before upload:", moduleFields);
 
     try {
       const updatedFields = moduleFields.map(moduleItem => ({
         ...moduleItem,
+        courseId: selectedCourseId, // Add courseId to each module
         duration:
           moduleItem.duration.hours * 3600 +
           moduleItem.duration.minutes * 60 +
-          moduleItem.duration.seconds, // Convert module duration to seconds
+          moduleItem.duration.seconds,
         subModules: moduleItem.subModules.map(sub => ({
           ...sub,
-          duration: sub.duration.minutes * 60 + sub.duration.seconds, // Convert submodule duration to seconds
+          duration: sub.duration.minutes * 60 + sub.duration.seconds,
         })),
       }));
+
       let count = 0;
       // Iterate over modules and submodules to upload videos
       for (const moduleItem of updatedFields) {
         for (const subModule of moduleItem.subModules) {
           if (subModule.videoLecture instanceof File) {
-            count+=1;
+            count += 1;
             const uploadedUrl = await uploadToCloudinary(
               subModule.videoLecture
             );
             if (uploadedUrl) {
               subModule.videoLecture = uploadedUrl;
-              toast.success(`Video upload ${count} successfull`);
+              toast.success(`Video upload ${count} successful`);
             } else {
               toast.error(`Video upload ${count} failed`);
               throw new Error(`Video upload ${count} failed`);
@@ -229,7 +396,10 @@ const Breakdown: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(updatedFields),
+        body: JSON.stringify({
+          courseId: selectedCourseId,
+          modules: updatedFields
+        }),
       });
 
       if (!response.ok) {
@@ -238,15 +408,15 @@ const Breakdown: React.FC = () => {
 
       const result = await response.json();
       console.log("Success:", result);
-      toast.success("Data saved successfully!");
+      toast.success("Course breakdown saved successfully!");
     } catch (error) {
       console.error("Error saving data:", error);
-      toast.error("Failed to save data.");
+      toast.error("Failed to save course breakdown.");
     } finally {
-      setIsSaving(false); // Reset saving state after operation
+      setIsSaving(false);
     }
   };
-  
+
   const handleModuleDurationChange = (
     moduleIndex: number,
     field: keyof ModuleField["duration"],
@@ -282,298 +452,369 @@ const Breakdown: React.FC = () => {
       )
     );
   };
-  
-  const handleVideoUpload = async (
+
+  const handleVideoUpload = (
     moduleIndex: number,
     subIndex: number,
     file: File
   ) => {
-    const uploadedUrl = await uploadToCloudinary(file);
-    if (uploadedUrl) {
-      handleInternalDetailChange(
-        moduleIndex,
-        subIndex,
-        "videoLecture",
-        uploadedUrl
-      );
-    } else {
-      toast.error("Failed to upload video.");
-    }
+    handleInternalDetailChange(
+      moduleIndex,
+      subIndex,
+      "videoLecture",
+      file
+    );
   };
 
   const removeVideo = (moduleIndex: number, subIndex: number) => {
     handleInternalDetailChange(moduleIndex, subIndex, "videoLecture", null);
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <Card className="p-8">
+          <div className="flex items-center gap-4">
+            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+            <div>
+              <h3 className="text-lg font-semibold">Loading your courses...</h3>
+              <p className="text-gray-600">Please wait while we fetch your data</p>
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
   return (
-    <div className="grid max-w-screen-xl mx-auto">
-      <h1 className="text-2xl font-bold text-purple-700 mb-6">
-        Course Breakdown
-      </h1>
-
-      {moduleFields.map((field, moduleIndex) => (
-        <div key={moduleIndex} className="mb-8 border-[1px] border-gray-400 p-4 rounded-lg">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="flex items-center gap-2 text-lg font-semibold text-purple-700">
-            <MdViewModule/>  Module {moduleIndex + 1}
-            </h2>
-            <FaTrash
-              className="text-red-500 cursor-pointer hover:text-red-700"
-              onClick={() => deleteModule(moduleIndex)}
-            />
-          </div>
-          <table className="w-2/3 mx-auto mt-4 border border-gray-300 rounded-3xl">
-            <tbody className="" >
-              {["number", "topic", "parts", "reward"].map((key) => (
-                <tr key={key} >
-                  <td className="px-4 py-2 bg-gray-100 font-semibold text-purple-700">
-                    {key} <span className="text-red-500">*</span>
-                  </td>
-                  <td className="px-4 py-2 ">
-                    <input
-                      type={key === "topic" ? "text" : "number"}
-                      value={field[key as keyof ModuleField] as string | number}
-                      placeholder={`Enter ${key}`}
-                      className="w-full max-w-lg px-2 py-2 border bg-slate-100 border-gray-300 rounded-lg hover:border-gray-400 outline-none"
-                      onChange={(e) =>
-                        handleModuleInputChange(
-                          moduleIndex,
-                          key as keyof ModuleField,
-                          e.target.value
-                        )
-                      }
-                    />
-                  </td>
-                </tr>
-              ))}
-              {/* Duration Field */}
-              <tr>
-                <td className="px-4 py-2 bg-gray-100 font-semibold text-purple-700">
-                  Duration <span className="text-red-500">*</span>
-                </td>
-                <td className="px-4 py-2 flex space-x-2">
-                  <input
-                    type="number"
-                    placeholder="Hrs"
-                    value={field.duration.hours || ""}
-                    className="w-16 px-2 py-1 border border-gray-300 hover:border-gray-300 rounded-md outline-none"
-                    onChange={(e) =>
-                      handleModuleDurationChange(
-                        moduleIndex,
-                        "hours",
-                        Number(e.target.value)
-                      )
-                    }
-                  />
-                  <input
-                    type="number"
-                    placeholder="Min"
-                    value={field.duration.minutes || ""}
-                    className="w-16 px-2 py-1 border border-gray-300 hover:border-gray-300 rounded-md outline-none"
-                    onChange={(e) =>
-                      handleModuleDurationChange(
-                        moduleIndex,
-                        "minutes",
-                        Number(e.target.value)
-                      )
-                    }
-                  />
-                  <input
-                    type="number"
-                    placeholder="Secs"
-                    value={field.duration.seconds || ""}
-                    className="w-16 px-2 py-1 border border-gray-300 hover:border-gray-300 rounded-md outline-none"
-                    onChange={(e) =>
-                      handleModuleDurationChange(
-                        moduleIndex,
-                        "seconds",
-                        Number(e.target.value)
-                      )
-                    }
-                  />
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-          <div className="mt-6 w-2/3 rounded-md mx-auto">
-            <h2 className="text-lg font-semibold text-purple-700 mb-4">
-              <AiFillProduct className="inline-block" /> Sub Modules
-            </h2>
-            <table className="border border-gray-300 mb-4 ">
-              <thead className="bg-gray-100">
-                <tr className="">
-                  {["partNumber", "partName", "duration", "videoLecture"].map(
-                    (heading) => (
-                      <th
-                        key={heading}
-                        className="px-4 py-2 text-left font-semibold text-purple-700"
-                      >
-                        <div className="inline-flex">
-
-                      {heading} <pre className="text-red-500"> *</pre>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
+      <div className="max-w-6xl mx-auto space-y-6">
+        {/* Course Selection */}
+        <Card className="shadow-lg border-0 bg-gradient-to-br from-white to-gray-50">
+          <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-lg">
+            <CardTitle className="text-2xl font-bold flex items-center gap-2">
+              <Book className="w-6 h-6" />
+              Select Course for Breakdown Setup
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            {courses.length === 0 ? (
+              <Alert>
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  No courses found. Please create a course first before setting up the breakdown.
+                </AlertDescription>
+              </Alert>
+            ) : (
+              <div className="space-y-4">
+                <Label className="text-lg font-semibold">Choose a course:</Label>
+                <Select value={selectedCourseId} onValueChange={handleCourseSelect}>
+                  <SelectTrigger className="h-12">
+                    <SelectValue placeholder="Select a course to create breakdown" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {courses.map((course) => (
+                      <SelectItem key={course.courseId} value={course.courseId}>
+                        <div className="flex items-center gap-3">
+                          <img 
+                            src={course.image} 
+                            alt={course.name}
+                            className="w-10 h-10 rounded object-cover"
+                          />
+                          <div>
+                            <p className="font-semibold">{course.name}</p>
+                            <p className="text-sm text-gray-600">
+                              ${course.current} • {course.duration}h
+                            </p>
+                          </div>
                         </div>
-                      </th>
-                    )
-                  )}
-                </tr>
-              </thead>
-              <tbody>
-                {field.subModules.map((row, subIndex) => (
-                  <tr key={subIndex} className="">
-                    <thead className="px-4 py-2">
-                      <input
-                        type="number"
-                        placeholder="Part Number"
-                        value={row.partNumber}
-                        className="w-full px-2 py-1 border border-gray-300 rounded-md"
-                        onChange={(e) =>
-                          handleInternalDetailChange(
-                            moduleIndex,
-                            subIndex,
-                            "partNumber",
-                            Number(e.target.value)
-                          )
-                        }
-                      />
-                    </thead>
-                    <td className="px-4 py-2">
-                      <input
-                        type="text"
-                        placeholder="Part Name"
-                        value={row.partName}
-                        className="w-full px-2 py-1 border border-gray-300 rounded-md"
-                        onChange={(e) =>
-                          handleInternalDetailChange(
-                            moduleIndex,
-                            subIndex,
-                            "partName",
-                            e.target.value
-                          )
-                        }
-                      />
-                    </td>
-                    {/* Duration Fields for Sub Modules */}
-                    <td className="px-4 py-2 flex  space-x-2">
-                      <input
-                        type="number"
-                        placeholder="Min"
-                        value={row.duration.minutes || ""}
-                        className="w-16 px-2 py-1 border border-gray-300 rounded-md"
-                        onChange={(e) =>
-                          handleSubModuleDurationChange(
-                            moduleIndex,
-                            subIndex,
-                            "minutes",
-                            Number(e.target.value)
-                          )
-                        }
-                      />
-                      <input
-                        type="number"
-                        placeholder="Sec"
-                        value={row.duration.seconds || ""}
-                        className="w-16 px-2 py-1 border border-gray-300 rounded-md"
-                        onChange={(e) =>
-                          handleSubModuleDurationChange(
-                            moduleIndex,
-                            subIndex,
-                            "seconds",
-                            Number(e.target.value)
-                          )
-                        }
-                      />
-                    </td>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
-                    {/* Video Upload */}
-                    <td className="px-4 py-2">
-                      <div className="flex items-center space-x-2">
-                        {/* Hidden File Input */}
-                        <input
-                          type="file"
-                          accept="video/*"
-                          className="hidden"
-                          id={`video-upload-${moduleIndex}-${subIndex}`}
-                          onChange={(e) =>
-                            e.target.files &&
-                            handleVideoUpload(
-                              moduleIndex,
-                              subIndex,
-                              e.target.files[0] || null
-                            )
-                          }
+        {selectedCourseId && (
+          <>
+            {/* Course Breakdown Header */}
+            <Card className="shadow-lg border-0 bg-gradient-to-br from-white to-gray-50">
+              <CardHeader className="bg-gradient-to-r from-green-600 to-teal-600 text-white">
+                <CardTitle className="text-2xl font-bold flex items-center gap-2">
+                  <MdViewModule className="w-6 h-6" />
+                  Course Breakdown
+                </CardTitle>
+              </CardHeader>
+            </Card>
+
+            {/* Module Fields */}
+            {moduleFields.map((field, moduleIndex) => (
+              <Card key={moduleIndex} className="shadow-lg border-0 bg-gradient-to-br from-white to-gray-50">
+                <CardHeader className="bg-gradient-to-r from-indigo-600 to-purple-600 text-black">
+                  <div className="flex justify-between items-center">
+                    <CardTitle className="text-xl font-bold flex items-center gap-2">
+                      <MdViewModule className="w-5 h-5" />
+                      Module {moduleIndex + 1}
+                    </CardTitle>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => deleteModule(moduleIndex)}
+                      className="text-white hover:text-red-200 hover:bg-red-500/20"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="p-6 space-y-6">
+                  {/* Module Basic Info */}
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-3">
+                      <Label className="font-semibold flex items-center gap-2">
+                        Module Number <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        type="number"
+                        value={field.number}
+                        onChange={(e) => handleModuleInputChange(moduleIndex, "number", e.target.value)}
+                        className="h-12"
+                      />
+                    </div>
+                    <div className="space-y-3">
+                      <Label className="font-semibold flex items-center gap-2">
+                        <Award className="w-4 h-4" />
+                        Reward Points <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        type="number"
+                        value={field.reward}
+                        onChange={(e) => handleModuleInputChange(moduleIndex, "reward", e.target.value)}
+                        className="h-12"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <Label className="font-semibold">
+                      Module Topic <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      value={field.topic}
+                      onChange={(e) => handleModuleInputChange(moduleIndex, "topic", e.target.value)}
+                      placeholder="Enter module topic"
+                      className="h-12"
+                    />
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div className="space-y-3">
+                      <Label className="font-semibold">
+                        Number of Parts <span className="text-red-500">*</span>
+                      </Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        value={field.parts}
+                        onChange={(e) => handleModuleInputChange(moduleIndex, "parts", e.target.value)}
+                        className="h-12"
+                      />
+                    </div>
+                    <div className="space-y-3">
+                      <Label className="font-semibold flex items-center gap-2">
+                        <Clock className="w-4 h-4" />
+                        Duration <span className="text-red-500">*</span>
+                      </Label>
+                      <div className="flex gap-2">
+                        <Input
+                          type="number"
+                          placeholder="Hrs"
+                          min="0"
+                          value={field.duration.hours || ""}
+                          onChange={(e) => handleModuleDurationChange(moduleIndex, "hours", Number(e.target.value))}
+                          className="h-12"
                         />
-
-                        {/* Upload Button */}
-                        <label
-                          htmlFor={`video-upload-${moduleIndex}-${subIndex}`}
-                          className={`px-3 py-1 rounded-md cursor-pointer text-white ${
-                            moduleFields[moduleIndex].subModules[subIndex]
-                              .videoLecture
-                              ? "bg-green-500"
-                              : "bg-blue-500"
-                          }`}
-                        >
-                          {moduleFields[moduleIndex].subModules[subIndex]
-                            .videoLecture
-                            ? "Video Uploaded"
-                            : "Upload"}
-                        </label>
-
-                        {/* Remove Button (Cross Icon) */}
-                        {moduleFields[moduleIndex].subModules[subIndex]
-                          .videoLecture && (
-                          <button
-                            onClick={() => removeVideo(moduleIndex, subIndex)}
-                            className="text-red-500 hover:text-red-700"
-                          >
-                            ❌
-                          </button>
-                        )}
+                        <Input
+                          type="number"
+                          placeholder="Min"
+                          min="0"
+                          max="59"
+                          value={field.duration.minutes || ""}
+                          onChange={(e) => handleModuleDurationChange(moduleIndex, "minutes", Number(e.target.value))}
+                          className="h-12"
+                        />
+                        <Input
+                          type="number"
+                          placeholder="Sec"
+                          min="0"
+                          max="59"
+                          value={field.duration.seconds || ""}
+                          onChange={(e) => handleModuleDurationChange(moduleIndex, "seconds", Number(e.target.value))}
+                          className="h-12"
+                        />
                       </div>
-                    </td>
+                    </div>
+                  </div>
 
-                    <td className="px-4 py-2 text-center">
-                      <FaTrash
-                        className="text-red-500 cursor-pointer hover:text-red-700"
-                        onClick={() => deleteSubModule(moduleIndex, subIndex)}
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                  <Separator />
 
-            <button
-              className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-md"
-              onClick={() => addInternalDetailRow(moduleIndex)}
-            >
-              Add Sub Module
-            </button>
-          </div>
-        </div>
-      ))}
+                  {/* Sub Modules Section */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold flex items-center gap-2 text-purple-700">
+                      <AiFillProduct className="w-5 h-5" />
+                      Sub Modules
+                    </h3>
+                    
+                    <div className="space-y-4">
+                      {field.subModules.map((row, subIndex) => (
+                        <Card key={subIndex} className="border-2 border-gray-200">
+                          <CardContent className="p-4">
+                            <div className="grid md:grid-cols-2 gap-4 mb-4">
+                              <div className="space-y-2">
+                                <Label className="font-semibold">
+                                  Part Number <span className="text-red-500">*</span>
+                                </Label>
+                                <Input
+                                  type="number"
+                                  value={row.partNumber}
+                                  onChange={(e) => handleInternalDetailChange(moduleIndex, subIndex, "partNumber", Number(e.target.value))}
+                                  className="h-10"
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <Label className="font-semibold">
+                                  Part Name <span className="text-red-500">*</span>
+                                </Label>
+                                <Input
+                                  value={row.partName}
+                                  onChange={(e) => handleInternalDetailChange(moduleIndex, subIndex, "partName", e.target.value)}
+                                  placeholder="Enter part name"
+                                  className="h-10"
+                                />
+                              </div>
+                            </div>
 
-      <button
-        className="mt-4 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-md"
-        onClick={addModuleField}
-      >
-        Add Module
-      </button>
+                            <div className="grid md:grid-cols-2 gap-4 mb-4">
+                              <div className="space-y-2">
+                                <Label className="font-semibold flex items-center gap-2">
+                                  <Clock className="w-4 h-4" />
+                                  Duration <span className="text-red-500">*</span>
+                                </Label>
+                                <div className="flex gap-2">
+                                  <Input
+                                    type="number"
+                                    placeholder="Min"
+                                    min="0"
+                                    value={row.duration.minutes || ""}
+                                    onChange={(e) => handleSubModuleDurationChange(moduleIndex, subIndex, "minutes", Number(e.target.value))}
+                                    className="h-10"
+                                  />
+                                  <Input
+                                    type="number"
+                                    placeholder="Sec"
+                                    min="0"
+                                    max="59"
+                                    value={row.duration.seconds || ""}
+                                    onChange={(e) => handleSubModuleDurationChange(moduleIndex, subIndex, "seconds", Number(e.target.value))}
+                                    className="h-10"
+                                  />
+                                </div>
+                              </div>
+                              <div className="space-y-2">
+                                <Label className="font-semibold flex items-center gap-2">
+                                  <Video className="w-4 h-4" />
+                                  Video Lecture <span className="text-red-500">*</span>
+                                </Label>
+                                <div className="flex items-center gap-2">
+                                  <Input
+                                    type="file"
+                                    accept="video/*"
+                                    onChange={(e) => e.target.files && handleVideoUpload(moduleIndex, subIndex, e.target.files[0])}
+                                    className="h-10"
+                                  />
+                                  {row.videoLecture && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => removeVideo(moduleIndex, subIndex)}
+                                      className="text-red-500 hover:text-red-700"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                  )}
+                                </div>
+                                {row.videoLecture && (
+                                  <div className="flex items-center gap-2 text-sm text-green-600">
+                                    <CheckCircle2 className="w-4 h-4" />
+                                    Video selected
+                                  </div>
+                                )}
+                              </div>
+                            </div>
 
-      {/* Save Button */}
-      <div className="flex justify-center mt-8">
-        <button
-          onClick={handleSave}
-          disabled={isSaving}
-          className={`px-6 py-3 font-bold rounded-md text-white ${
-            isSaving
-              ? "bg-green-800 cursor-not-allowed"
-              : "bg-gradient-to-r from-green-500 to-green-600 hover:bg-green-600"
-          }`}
-        >
-          {isSaving ? "Saving..." : "Save"}
-        </button>
+                            <div className="flex justify-end">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => deleteSubModule(moduleIndex, subIndex)}
+                                className="text-red-500 hover:text-red-700"
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Remove Part
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+
+                    <Button
+                      onClick={() => addInternalDetailRow(moduleIndex)}
+                      className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
+                      disabled={field.subModules.length >= field.parts}
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Sub Module ({field.subModules.length}/{field.parts})
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+
+            {/* Add Module Button */}
+            <div className="flex justify-center">
+              <Button
+                onClick={addModuleField}
+                className="px-8 py-4 text-lg bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 shadow-lg"
+              >
+                <Plus className="w-5 h-5 mr-3" />
+                Add New Module
+              </Button>
+            </div>
+
+            {/* Save Button */}
+            <div className="flex justify-center">
+              <Button
+                onClick={handleSave}
+                disabled={isSaving || !selectedCourseId}
+                className="px-12 py-4 text-lg font-semibold bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg transform transition-all duration-200 hover:scale-105"
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-3 animate-spin" />
+                    Saving Course Breakdown...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="w-5 h-5 mr-3" />
+                    Save Course Breakdown
+                  </>
+                )}
+              </Button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
