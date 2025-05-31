@@ -88,7 +88,11 @@ const modules: Module[] = [
 
 ];
 
-const CourseAccordion: React.FC = () => {
+interface CourseAccordionProps {
+  courseId?: string | string[];
+}
+
+const CourseAccordion: React.FC<CourseAccordionProps> = ({ courseId }) => {
   const [openModule, setOpenModule] = useState<number | null>(null);
 
   const toggleModule = (id: number) => {
@@ -177,9 +181,6 @@ const CourseAccordion: React.FC = () => {
           ))}
         </div>
       </div>
-
-     
-     
     </div>
   );
 };

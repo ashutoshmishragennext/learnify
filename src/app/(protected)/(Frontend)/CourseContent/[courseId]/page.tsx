@@ -178,8 +178,8 @@ const CourseContentPage: React.FC = () => {
         
         if (result) {
           setCourseIncluded(true);
-          toast.info("Redirecting you to Dashboard");
-          router.push("/DashBoard");
+          toast.info("Redirecting you to Your Courses");
+          router.push("/dashboard/student/courses");
         }
       }
     } catch (error : any) {
