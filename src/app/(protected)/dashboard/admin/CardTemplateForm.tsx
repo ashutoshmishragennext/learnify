@@ -1,6 +1,6 @@
 "use client";
 
-import { FormInstructions } from "@/components/FormIntruction";
+// import { FormInstructions } from "@/components/FormIntruction";
 import ImageUpload from "@/components/ImageUpload";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -180,7 +180,7 @@ const CardTemplateForm: React.FC = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-6">
-      <FormInstructions />
+      {/* <FormInstructions /> */}
       
       <Card className="shadow-lg border-0 bg-gradient-to-br from-white to-gray-50">
         <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-lg">
