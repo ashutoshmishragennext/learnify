@@ -110,7 +110,7 @@ const CardRedirectForBuyCourses: React.FC<CardProps> = ({
   };
 
   return (
-    <div className="w-full max-w-[360px] bg-white rounded-lg shadow-lg border hover:shadow-xl transform hover:scale-105 transition-transform duration-300 flex flex-col relative font-sans">
+    <div className="w-full max-w-[360px]  bg-white rounded-lg shadow-lg border hover:shadow-xl transform hover:scale-105 transition-transform duration-300 flex flex-col mx-auto relative font-sans">
       {/* Image Section */}
       <div className="relative">
         <Image
