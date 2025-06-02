@@ -1,4 +1,5 @@
-
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -128,7 +129,7 @@ const Courses: React.FC<{ session?: Session | null |  any }> = ({ session }) => 
             ))}
           </div>
         ) : (
-          <div className="text-center text-lg">You haven't Purchased any Courses Yet</div>
+          <div className="text-center text-lg">You haven&apos;t Purchased any Courses Yet</div>
         )}
       </div>
       <Footer />
