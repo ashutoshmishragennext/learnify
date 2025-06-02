@@ -89,10 +89,13 @@
 
 "use client";
 
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 const Consist: React.FC = () => {
+  const router = useRouter();
   return (
     <section className="relative flex flex-col md:flex-row items-center justify-between px-6 md:px-10 pt-16 pb-12 bg-white rounded-lg shadow-lg border border-blue-300">
       {/* Left Content */}
@@ -105,7 +108,7 @@ const Consist: React.FC = () => {
         </p>
 
         {/* CTA Heading */}
-        <div className="z-10 mt-28 p-3 w-full max-w-xs sm:max-w-md bg-learnify text-white shadow-lg rounded-lg">
+        <div onClick={()=> {router.push("/dashboard/student/courses")}}  className="cursor-pointer z-10 mt-28 p-3 w-full max-w-xs sm:max-w-md bg-learnify text-white shadow-lg rounded-lg">
           <h2 className="text-xl md:text-2xl font-semibold text-center">
             Learn with <span className="custom-font-style">Learnify</span>
           </h2>

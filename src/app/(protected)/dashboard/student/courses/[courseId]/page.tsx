@@ -1,19 +1,18 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"
-
-import CourseAccordion from '@/app/(protected)/(Frontend)/ParticularCourse/CourseAccordian'
-import { useParams } from 'next/navigation';
 import React from 'react'
+import dotenv from "dotenv";
+import Navbar from '@/components/ui/Navbar';
+import StudentCourse from './StudentCourse';
+import { auth } from '../../../../../../../auth';
+dotenv.config();
 
-const Page = () => {
-  const { courseId } = useParams();
-    
-  if(!courseId) 
-    return <div>Please wait while we fetch the details of your course.</div>
+const page = async () => {
+  const session = await auth();
   return (
-    <CourseAccordion courseId = {courseId} />
+    <div className="pt-[64px]">
+      <Navbar session = {session}/>
+      <StudentCourse />
+    </div>
   )
 }
 
-export default Page
+export default page

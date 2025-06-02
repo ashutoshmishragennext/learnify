@@ -92,7 +92,7 @@ const Navbar: React.FC<{ session?: Session | null |  any }> = ({ session }) => {
               <button
                 onClick={() => handleNavigation("/dashboard/student/courses")}
                 className={`hover:underline ${
-                  pathname === "/dashboard/student/courses" ? "underline decoration-2 decoration-pink-300" : ""
+                  pathname.startsWith("/dashboard/student/courses") ? "underline decoration-2 decoration-pink-300" : ""
                 } hover:underline decoration-2 decoration-white text-white`}
               >
                 Your Courses
