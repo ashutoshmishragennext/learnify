@@ -1,9 +1,7 @@
 import React from 'react'
-import dotenv from "dotenv";
 import Navbar from '@/components/ui/Navbar';
 import { auth } from '../../../../../../auth';
-import Courses from './CoursePage';
-dotenv.config();
+import Courses from '@/app/(protected)/(Frontend)/ExploreData/Courses';
 
 const page = async () => {
   const session = await auth();

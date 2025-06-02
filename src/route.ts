@@ -25,7 +25,7 @@ export const authRoutes: string[] = [
 
 // Routes which are protected with diffferent roles
 export const protectedRoutes: Record<string, any> = {
-  "^/dashboard/admin(/.*)?$": ["STUDENT"],
+  "^/dashboard/admin(/.*)?$": ["ADMIN"],
   "^/dashboard/user(/.*)?$": ["USER","STUDENT"],
   "^/dashboard/student(/.*)?$": ["STUDENT"],
   "^/dashboard/teacher(/.*)?$": ["TEACHER"],

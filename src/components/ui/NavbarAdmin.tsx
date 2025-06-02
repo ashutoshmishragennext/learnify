@@ -15,7 +15,7 @@ import SearchBar from "./SearchBar";
 import { motion, AnimatePresence } from "framer-motion";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const Navbar: React.FC<{ session?: Session | null |  any }> = ({ session }) => {
+const NavbarAdmin: React.FC<{ session?: Session | null |  any }> = ({ session }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -37,7 +37,7 @@ const Navbar: React.FC<{ session?: Session | null |  any }> = ({ session }) => {
 
   return (
     <>
-      {/* Main Navbar */}
+      {/* Main NavbarAdmin */}
       <nav className="bg-custom-gradient text-white py-4 px-6 shadow-lg fixed top-0 left-0 w-full z-50">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Logo Section */}
@@ -68,7 +68,7 @@ const Navbar: React.FC<{ session?: Session | null |  any }> = ({ session }) => {
 
           {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-6">
-            <button
+            {/* <button
               onClick={() => handleNavigation("/dashboard")}
               className={`${
                 pathname === "/dashboard/student"
@@ -81,21 +81,21 @@ const Navbar: React.FC<{ session?: Session | null |  any }> = ({ session }) => {
             <button
               onClick={() => handleNavigation("/dashboard/student/ExploreData")}
               className={`${
-                pathname === "/dashboard/student/ExploreData"
+                pathname === "/ExploreData || /dashboard/student/ExploreData"
                   ? "underline decoration-2 decoration-white-300"
                   : ""
               } hover:underline decoration-2 decoration-white text-white`}
             >
               Explore
-            </button>
+            </button> */}
             {session && (
               <button
-                onClick={() => handleNavigation("/dashboard/student/courses")}
+                onClick={() => handleNavigation("/dashboard/admin")}
                 className={`hover:underline ${
-                  pathname === "/dashboard/student/courses" ? "underline decoration-2 decoration-pink-300" : ""
+                  pathname === "/dashboard/admin" ? "text-white" : ""
                 } hover:underline decoration-2 decoration-white text-white`}
               >
-                Your Courses
+                Admin Interface
               </button>
             )}
           </div>
@@ -165,6 +165,7 @@ const Navbar: React.FC<{ session?: Session | null |  any }> = ({ session }) => {
           </div>
         </div>
       </nav>
+
       {/* Sidebar */}
       <AnimatePresence>
         {isSidebarOpen && (
@@ -200,10 +201,10 @@ const Navbar: React.FC<{ session?: Session | null |  any }> = ({ session }) => {
 
               {/* Sidebar Links */}
               <div className="flex flex-col p-4 space-y-4">
-                <button
+                {/* <button
                   onClick={() => handleNavigation("/dashboard/student")}
                   className={`text-gray-800 hover:text-purple-600 ${
-                    pathname === "/dashboard/student" ? "font-bold" : ""
+                    pathname === "/" || "/dashboard/student" ? "font-bold" : ""
                   }`}
                 >
                   Home
@@ -211,19 +212,19 @@ const Navbar: React.FC<{ session?: Session | null |  any }> = ({ session }) => {
                 <button
                   onClick={() => handleNavigation("/dashboard/student/ExploreData")}
                   className={`text-gray-800 hover:text-purple-600 ${
-                    pathname === "/dashboard/student/ExploreData" ? "font-bold" : ""
+                    pathname === "/ExploreData" ? "font-bold" : ""
                   }`}
                 >
                   Explore
-                </button>
+                </button> */}
                 {session ? (
                   <button
-                    onClick={() => handleNavigation("/dashboard/student/courses")}
+                    onClick={() => handleNavigation("/dashboard/admin")}
                     className={`text-gray-800 hover:text-purple-600 ${
-                      pathname === "/dashboard/student/courses" ? "font-bold" : ""
-                    }`}
+                      pathname === "/dashboard/admin" ? "font-bold" : ""
+                    } `}
                   >
-                    Your Courses
+                    Admin Interface
                   </button>
                 ) : (
                   ""
@@ -261,4 +262,4 @@ const Navbar: React.FC<{ session?: Session | null |  any }> = ({ session }) => {
   );
 };
 
-export default Navbar;
+export default NavbarAdmin;

@@ -4,15 +4,17 @@
 import React from 'react';
 import Sidebar from "./Sidebar";
 import AdminCoursePage from "./AdminCoursePage";
-const AdminDashboard: React.FC = () => {
+import { auth } from '../../../../../auth';
+import NavbarAdmin from '@/components/ui/NavbarAdmin';
+const AdminDashboard: React.FC = async () => {
+  const session = await auth();
   return (
-
-
-   <div className="flex">
-  
+   <div className="">
+      <NavbarAdmin  session = {session} />
     {/* <div className="w-1/5 min-h-screen bg-white">
      <Sidebar />
     </div> */}
+
 
   
     <div className="w-full p-0"> 

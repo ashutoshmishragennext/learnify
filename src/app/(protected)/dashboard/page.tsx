@@ -1,49 +1,31 @@
 "use client";
 
+import { useCurrentUser } from "@/hooks/auth";
 import { useCurrentRole } from "@/hooks/auth/useCurrentRole";
-// import { useCurrentUser } from "@/hooks/auth";
-// import { useCurrentRole } from "@/hooks/auth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function Dashboard() {
   const router = useRouter();
-  // const user = useCurrentUser();
-  // console.log("role",user);
   const role =  useCurrentRole()
-  // const role1 = role?.role;
-  
-  // console.log("roleeeeeee",role1);
-  
-  
+  const user =  useCurrentUser()
   const [isRedirecting, setIsRedirecting] = useState(false);
-  //  const role = "STUDENT";
 
   console.log("role",role);
-  
-  
-  // if (!role) {
-  //   window.location.reload();
-  // }
+    console.log("USER",user);
 
   useEffect(() => {
     if (!role) {
-      // window.location.reload();
       router.push("/auth/login");
       return;
     }
-
     setIsRedirecting(true);
-   
-    
-
-
-    switch (role) {
+    switch (role.trim()) {
       case "ADMIN":
-        router.push("/dashboard/admin/");
+        router.push("/dashboard/admin");
         break;
       case "STUDENT":
-          router.push("/dashboard/student/");
+          router.push("/dashboard/student");
           break;
       default:
         setIsRedirecting(false);
@@ -65,14 +47,3 @@ export default function Dashboard() {
     <div className="mx-4">{/* Your default dashboard content goes here */}</div>
   );
 }
-// import React from 'react'
-
-// const page = () => {
-//   return (
-//     <div>
-//       hii i am in
-//     </div>
-//   )
-// }
-
-// export default page

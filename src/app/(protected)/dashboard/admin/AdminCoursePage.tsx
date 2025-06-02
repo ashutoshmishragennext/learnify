@@ -10,7 +10,7 @@ const AdminCoursePage: React.FC = () => {
   const tabs = ["Card Template", "Intro Page", "Breakdown"];
 
   return (
-    <div className="min-h-screen w-full bg-gray-100">
+    <div className="min-h-screen w-full bg-gray-100 mt-4">
       {/* Main Content */}
       <main className="flex-1 p-2">
         {/* Top Navigation */}
