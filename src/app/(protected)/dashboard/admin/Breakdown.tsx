@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   AlertCircle,
   Book,
@@ -22,7 +23,9 @@ import {
   Clock,
   Award,
   FileVideo,
-  Trash2
+  Trash2,
+  Link,
+  Upload
 } from "lucide-react";
 
 // Define types for module fields and internal details
@@ -30,7 +33,8 @@ interface InternalDetail {
   partNumber: number;
   partName: string;
   duration: { minutes: number; seconds: number };
-  videoLecture: File | null;
+  videoLecture: File | string | null; // Updated to accept both File and string (URL)
+  videoType: 'file' | 'url'; // New field to track video type
 }
 
 interface ModuleField {
@@ -121,6 +125,7 @@ const Breakdown: React.FC = () => {
           partName: "",
           duration: { minutes: 0, seconds: 0 },
           videoLecture: null,
+          videoType: 'url', // Default to URL
         },
       ],
     },
@@ -151,9 +156,47 @@ const Breakdown: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
         if (data && data.length > 0) {
-          setModuleFields(data);
+          // Convert the fetched data to match our component structure
+          const convertedData = data.map((module: any) => ({
+            ...module,
+            subModules: module.subModules.map((sub: any) => ({
+              ...sub,
+              videoType: typeof sub.videoLecture === 'string' && sub.videoLecture?.startsWith('http') ? 'url' : 'file',
+              duration: {
+  minutes: sub.duration?.minutes || 0,
+  seconds: sub.duration?.seconds || 0
+}
+            })),
+            duration: {
+  hours: module.duration?.hours || 0,
+  minutes: module.duration?.minutes || 0,
+  seconds: module.duration?.seconds || 0
+}
+          }));
+          setModuleFields(convertedData);
           toast.success("Course breakdown loaded successfully!");
         }
+        else {
+  // No existing data found, set default
+  setModuleFields([
+    {
+      number: 1,
+      topic: "",
+      parts: 1,
+      duration: { hours: 0, minutes: 0, seconds: 0 },
+      reward: 1,
+      subModules: [
+        {
+          partNumber: 1,
+          partName: "",
+          duration: { minutes: 0, seconds: 0 },
+          videoLecture: null,
+          videoType: 'url',
+        },
+      ],
+    },
+  ]);
+}
       }
     } catch (error) {
       console.error("Error fetching course breakdown:", error);
@@ -166,9 +209,13 @@ const Breakdown: React.FC = () => {
 
   // Handle course selection
   const handleCourseSelect = (courseId: string) => {
-    setSelectedCourseId(courseId);
-    
-    // Reset module fields to default when switching courses
+  setSelectedCourseId(courseId);
+  
+  // Don't reset immediately - let fetchCourseBreakdown handle it
+  if (courseId) {
+    fetchCourseBreakdown(courseId);
+  } else {
+    // Only reset if no courseId
     setModuleFields([
       {
         number: 1,
@@ -182,16 +229,13 @@ const Breakdown: React.FC = () => {
             partName: "",
             duration: { minutes: 0, seconds: 0 },
             videoLecture: null,
+            videoType: 'url',
           },
         ],
       },
     ]);
-    
-    // Try to fetch existing breakdown data
-    if (courseId) {
-      fetchCourseBreakdown(courseId);
-    }
-  };
+  }
+};
 
   const addModuleField = () => {
     setModuleFields([
@@ -208,6 +252,7 @@ const Breakdown: React.FC = () => {
             partName: "",
             duration: { minutes: 0, seconds: 0 },
             videoLecture: null,
+            videoType: 'url',
           },
         ],
       },
@@ -249,6 +294,7 @@ const Breakdown: React.FC = () => {
                     partName: "",
                     duration: { minutes: 0, seconds: 0 },
                     videoLecture: null,
+                    videoType: 'url',
                   },
                 ],
               }
@@ -304,6 +350,8 @@ const Breakdown: React.FC = () => {
                           ? (value ?? "").toString()
                           : field === "videoLecture"
                           ? value ?? ""
+                          : field === "videoType"
+                          ? value
                           : Number(value ?? 0),
                     }
                   : sub
@@ -347,11 +395,11 @@ const Breakdown: React.FC = () => {
     // Validate required fields
     const hasEmptyFields = moduleFields.some(module => 
       !module.topic || 
-      module.subModules.some(sub => !sub.partName)
+      module.subModules.some(sub => !sub.partName || !sub.videoLecture)
     );
 
     if (hasEmptyFields) {
-      toast.error("Please fill in all required fields");
+      toast.error("Please fill in all required fields including video lectures");
       return;
     }
 
@@ -361,7 +409,7 @@ const Breakdown: React.FC = () => {
     try {
       const updatedFields = moduleFields.map(moduleItem => ({
         ...moduleItem,
-        courseId: selectedCourseId, // Add courseId to each module
+        courseId: selectedCourseId,
         duration:
           moduleItem.duration.hours * 3600 +
           moduleItem.duration.minutes * 60 +
@@ -373,7 +421,7 @@ const Breakdown: React.FC = () => {
       }));
 
       let count = 0;
-      // Iterate over modules and submodules to upload videos
+      // Iterate over modules and submodules to upload videos (only files, not URLs)
       for (const moduleItem of updatedFields) {
         for (const subModule of moduleItem.subModules) {
           if (subModule.videoLecture instanceof File) {
@@ -389,6 +437,7 @@ const Breakdown: React.FC = () => {
               throw new Error(`Video upload ${count} failed`);
             }
           }
+          // If it's a URL (string), keep it as is
         }
       }
 
@@ -468,8 +517,51 @@ const Breakdown: React.FC = () => {
     );
   };
 
+  const handleVideoUrlChange = (
+    moduleIndex: number,
+    subIndex: number,
+    url: string
+  ) => {
+    handleInternalDetailChange(
+      moduleIndex,
+      subIndex,
+      "videoLecture",
+      url
+    );
+  };
+
+  const handleVideoTypeChange = (
+    moduleIndex: number,
+    subIndex: number,
+    type: 'file' | 'url'
+  ) => {
+    // Clear the video when switching types
+    handleInternalDetailChange(moduleIndex, subIndex, "videoLecture", null);
+    handleInternalDetailChange(moduleIndex, subIndex, "videoType", type);
+  };
+
   const removeVideo = (moduleIndex: number, subIndex: number) => {
     handleInternalDetailChange(moduleIndex, subIndex, "videoLecture", null);
+  };
+
+  const getVideoStatus = (subModule: InternalDetail) => {
+    if (!subModule.videoLecture) return null;
+    
+    if (subModule.videoType === 'url') {
+      return (
+        <div className="flex items-center gap-2 text-sm text-blue-600">
+          <Link className="w-4 h-4" />
+          Video URL added
+        </div>
+      );
+    } else {
+      return (
+        <div className="flex items-center gap-2 text-sm text-green-600">
+          <CheckCircle2 className="w-4 h-4" />
+          Video file selected
+        </div>
+      );
+    }
   };
 
   if (isLoading) {
@@ -728,30 +820,69 @@ const Breakdown: React.FC = () => {
                                   <Video className="w-4 h-4" />
                                   Video Lecture <span className="text-red-500">*</span>
                                 </Label>
-                                <div className="flex items-center gap-2">
-                                  <Input
-                                    type="file"
-                                    accept="video/*"
-                                    onChange={(e) => e.target.files && handleVideoUpload(moduleIndex, subIndex, e.target.files[0])}
-                                    className="h-10"
-                                  />
-                                  {row.videoLecture && (
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => removeVideo(moduleIndex, subIndex)}
-                                      className="text-red-500 hover:text-red-700"
-                                    >
-                                      <Trash2 className="w-4 h-4" />
-                                    </Button>
-                                  )}
-                                </div>
-                                {row.videoLecture && (
-                                  <div className="flex items-center gap-2 text-sm text-green-600">
-                                    <CheckCircle2 className="w-4 h-4" />
-                                    Video selected
-                                  </div>
-                                )}
+                                
+                                {/* Video Type Tabs */}
+                                <Tabs 
+                                  value={row.videoType} 
+                                  onValueChange={(value) => handleVideoTypeChange(moduleIndex, subIndex, value as 'file' | 'url')}
+                                  className="w-full"
+                                >
+                                  <TabsList className="grid w-full grid-cols-2">
+                                    <TabsTrigger value="url" className="flex items-center gap-2">
+                                      <Link className="w-4 h-4" />
+                                      URL
+                                    </TabsTrigger>
+                                    <TabsTrigger value="file" className="flex items-center gap-2">
+                                      <Upload className="w-4 h-4" />
+                                      Upload
+                                    </TabsTrigger>
+                                  </TabsList>
+                                  
+                                  <TabsContent value="url" className="mt-2">
+                                    <div className="flex items-center gap-2">
+                                      <Input
+                                        type="url"
+                                        placeholder="Enter video URL (YouTube, Vimeo, etc.)"
+                                        value={typeof row.videoLecture === 'string' ? row.videoLecture : ''}
+                                        onChange={(e) => handleVideoUrlChange(moduleIndex, subIndex, e.target.value)}
+                                        className="h-10"
+                                      />
+                                      {row.videoLecture && (
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={() => removeVideo(moduleIndex, subIndex)}
+                                          className="text-red-500 hover:text-red-700"
+                                        >
+                                          <Trash2 className="w-4 h-4" />
+                                        </Button>
+                                      )}
+                                    </div>
+                                  </TabsContent>
+                                  
+                                  <TabsContent value="file" className="mt-2">
+                                    <div className="flex items-center gap-2">
+                                      <Input
+                                        type="file"
+                                        accept="video/*"
+                                        onChange={(e) => e.target.files && handleVideoUpload(moduleIndex, subIndex, e.target.files[0])}
+                                        className="h-10"
+                                      />
+                                      {row.videoLecture && (
+                                        <Button
+                                          variant="ghost"
+                                          size="sm"
+                                          onClick={() => removeVideo(moduleIndex, subIndex)}
+                                          className="text-red-500 hover:text-red-700"
+                                        >
+                                          <Trash2 className="w-4 h-4" />
+                                        </Button>
+                                      )}
+                                    </div>
+                                  </TabsContent>
+                                </Tabs>
+                                
+                                {getVideoStatus(row)}
                               </div>
                             </div>
 

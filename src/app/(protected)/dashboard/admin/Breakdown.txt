@@ -12,7 +12,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   AlertCircle,
   Book,
@@ -23,9 +22,7 @@ import {
   Clock,
   Award,
   FileVideo,
-  Trash2,
-  Link,
-  Upload
+  Trash2
 } from "lucide-react";
 
 // Define types for module fields and internal details
@@ -33,8 +30,7 @@ interface InternalDetail {
   partNumber: number;
   partName: string;
   duration: { minutes: number; seconds: number };
-  videoLecture: File | string | null; // Updated to accept both File and string (URL)
-  videoType: 'file' | 'url'; // New field to track video type
+  videoLecture: File | null;
 }
 
 interface ModuleField {
@@ -125,7 +121,6 @@ const Breakdown: React.FC = () => {
           partName: "",
           duration: { minutes: 0, seconds: 0 },
           videoLecture: null,
-          videoType: 'url', // Default to URL
         },
       ],
     },
@@ -156,24 +151,7 @@ const Breakdown: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
         if (data && data.length > 0) {
-          // Convert the fetched data to match our component structure
-          const convertedData = data.map((module: any) => ({
-            ...module,
-            subModules: module.subModules.map((sub: any) => ({
-              ...sub,
-              videoType: typeof sub.videoLecture === 'string' && sub.videoLecture?.startsWith('http') ? 'url' : 'file',
-              duration: {
-                minutes: Math.floor((sub.duration || 0) / 60),
-                seconds: (sub.duration || 0) % 60
-              }
-            })),
-            duration: {
-              hours: Math.floor((module.duration || 0) / 3600),
-              minutes: Math.floor(((module.duration || 0) % 3600) / 60),
-              seconds: (module.duration || 0) % 60
-            }
-          }));
-          setModuleFields(convertedData);
+          setModuleFields(data);
           toast.success("Course breakdown loaded successfully!");
         }
       }
@@ -204,7 +182,6 @@ const Breakdown: React.FC = () => {
             partName: "",
             duration: { minutes: 0, seconds: 0 },
             videoLecture: null,
-            videoType: 'url',
           },
         ],
       },
@@ -231,7 +208,6 @@ const Breakdown: React.FC = () => {
             partName: "",
             duration: { minutes: 0, seconds: 0 },
             videoLecture: null,
-            videoType: 'url',
           },
         ],
       },
@@ -273,7 +249,6 @@ const Breakdown: React.FC = () => {
                     partName: "",
                     duration: { minutes: 0, seconds: 0 },
                     videoLecture: null,
-                    videoType: 'url',
                   },
                 ],
               }
@@ -329,8 +304,6 @@ const Breakdown: React.FC = () => {
                           ? (value ?? "").toString()
                           : field === "videoLecture"
                           ? value ?? ""
-                          : field === "videoType"
-                          ? value
                           : Number(value ?? 0),
                     }
                   : sub
@@ -374,11 +347,11 @@ const Breakdown: React.FC = () => {
     // Validate required fields
     const hasEmptyFields = moduleFields.some(module => 
       !module.topic || 
-      module.subModules.some(sub => !sub.partName || !sub.videoLecture)
+      module.subModules.some(sub => !sub.partName)
     );
 
     if (hasEmptyFields) {
-      toast.error("Please fill in all required fields including video lectures");
+      toast.error("Please fill in all required fields");
       return;
     }
 
@@ -388,7 +361,7 @@ const Breakdown: React.FC = () => {
     try {
       const updatedFields = moduleFields.map(moduleItem => ({
         ...moduleItem,
-        courseId: selectedCourseId,
+        courseId: selectedCourseId, // Add courseId to each module
         duration:
           moduleItem.duration.hours * 3600 +
           moduleItem.duration.minutes * 60 +
@@ -400,7 +373,7 @@ const Breakdown: React.FC = () => {
       }));
 
       let count = 0;
-      // Iterate over modules and submodules to upload videos (only files, not URLs)
+      // Iterate over modules and submodules to upload videos
       for (const moduleItem of updatedFields) {
         for (const subModule of moduleItem.subModules) {
           if (subModule.videoLecture instanceof File) {
@@ -416,7 +389,6 @@ const Breakdown: React.FC = () => {
               throw new Error(`Video upload ${count} failed`);
             }
           }
-          // If it's a URL (string), keep it as is
         }
       }
 
@@ -496,51 +468,8 @@ const Breakdown: React.FC = () => {
     );
   };
 
-  const handleVideoUrlChange = (
-    moduleIndex: number,
-    subIndex: number,
-    url: string
-  ) => {
-    handleInternalDetailChange(
-      moduleIndex,
-      subIndex,
-      "videoLecture",
-      url
-    );
-  };
-
-  const handleVideoTypeChange = (
-    moduleIndex: number,
-    subIndex: number,
-    type: 'file' | 'url'
-  ) => {
-    // Clear the video when switching types
-    handleInternalDetailChange(moduleIndex, subIndex, "videoLecture", null);
-    handleInternalDetailChange(moduleIndex, subIndex, "videoType", type);
-  };
-
   const removeVideo = (moduleIndex: number, subIndex: number) => {
     handleInternalDetailChange(moduleIndex, subIndex, "videoLecture", null);
-  };
-
-  const getVideoStatus = (subModule: InternalDetail) => {
-    if (!subModule.videoLecture) return null;
-    
-    if (subModule.videoType === 'url') {
-      return (
-        <div className="flex items-center gap-2 text-sm text-blue-600">
-          <Link className="w-4 h-4" />
-          Video URL added
-        </div>
-      );
-    } else {
-      return (
-        <div className="flex items-center gap-2 text-sm text-green-600">
-          <CheckCircle2 className="w-4 h-4" />
-          Video file selected
-        </div>
-      );
-    }
   };
 
   if (isLoading) {
@@ -799,66 +728,98 @@ const Breakdown: React.FC = () => {
                                   <Video className="w-4 h-4" />
                                   Video Lecture <span className="text-red-500">*</span>
                                 </Label>
-                                
-                                {/* Video Type Tabs */}
-                                <Tabs 
-                                  value={row.videoType} 
-                                  onValueChange={(value) => handleVideoTypeChange(moduleIndex, subIndex, value as 'file' | 'url')}
-                                  className="w-full"
-                                >
-                                  <TabsList className="grid w-full grid-cols-2">
-                                    <TabsTrigger value="url" className="flex items-center gap-2">
-                                      <Link className="w-4 h-4" />
-                                      URL
-                                    </TabsTrigger>
-                                    <TabsTrigger value="file" className="flex items-center gap-2">
-                                      <Upload className="w-4 h-4" />
-                                      Upload
-                                    </TabsTrigger>
-                                  </TabsList>
-                                  
-                                  <TabsContent value="url" className="mt-2">
-                                    <div className="flex items-center gap-2">
-                                      <Input
-                                        type="url"
-                                        placeholder="Enter video URL (YouTube, Vimeo, etc.)"
-                                        value={typeof row.videoLecture === 'string' ? row.videoLecture : ''}
-                                        onChange={(e) => handleVideoUrlChange(moduleIndex, subIndex, e.target.value)}
-                                        className="h-10"
-                                      />
-                                      {row.videoLecture && (
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          onClick={() => removeVideo(moduleIndex, subIndex)}
-                                          className="text-red-500 hover:text-red-700"
-                                        >
-                                          <Trash2 className="w-4 h-4" />
-                                        </Button>
-                                      )}
-                                    </div>
-                                  </TabsContent>
-                                  
-                                  <TabsContent value="file" className="mt-2">
-                                    <div className="flex items-center gap-2">
-                                      <Input
-                                        type="file"
-                                        accept="video/*"
-                                        onChange={(e) => e.target.files && handleVideoUpload(moduleIndex, subIndex, e.target.files[0])}
-                                        className="h-10"
-                                      />
-                                      {row.videoLecture && (
-                                        <Button
-                                          variant="ghost"
-                                          size="sm"
-                                          onClick={() => removeVideo(moduleIndex, subIndex)}
-                                          className="text-red-500 hover:text-red-700"
-                                        >
-                                          <Trash2 className="w-4 h-4" />
-                                        </Button>
-                                      )}
-                                    </div>
-                                  </TabsContent>
-                                </Tabs>
-                                
-                                {getVideoStatus(
+                                <div className="flex items-center gap-2">
+                                  <Input
+                                    type="file"
+                                    accept="video/*"
+                                    onChange={(e) => e.target.files && handleVideoUpload(moduleIndex, subIndex, e.target.files[0])}
+                                    className="h-10"
+                                  />
+                                  {row.videoLecture && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => removeVideo(moduleIndex, subIndex)}
+                                      className="text-red-500 hover:text-red-700"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                  )}
+                                </div>
+                                {row.videoLecture && (
+                                  <div className="flex items-center gap-2 text-sm text-green-600">
+                                    <CheckCircle2 className="w-4 h-4" />
+                                    Video selected
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="flex justify-end">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => deleteSubModule(moduleIndex, subIndex)}
+                                className="text-red-500 hover:text-red-700"
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Remove Part
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+
+                    <Button
+                      onClick={() => addInternalDetailRow(moduleIndex)}
+                      className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
+                      disabled={field.subModules.length >= field.parts}
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Sub Module ({field.subModules.length}/{field.parts})
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+
+            {/* Add Module Button */}
+            <div className="flex justify-center">
+              <Button
+                onClick={addModuleField}
+                className="px-8 py-4 text-lg bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 shadow-lg"
+              >
+                <Plus className="w-5 h-5 mr-3" />
+                Add New Module
+              </Button>
+            </div>
+
+            {/* Save Button */}
+            <div className="flex justify-center">
+              <Button
+                onClick={handleSave}
+                disabled={isSaving || !selectedCourseId}
+                className="px-12 py-4 text-lg font-semibold bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg transform transition-all duration-200 hover:scale-105"
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-3 animate-spin" />
+                    Saving Course Breakdown...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="w-5 h-5 mr-3" />
+                    Save Course Breakdown
+                  </>
+                )}
+              </Button>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Breakdown;
