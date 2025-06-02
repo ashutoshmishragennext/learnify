@@ -9,6 +9,7 @@ import Image from "next/image";
 import formatStudents from "@/lib/formatStudents";
 import { Session } from "next-auth";
 import { ICourse } from "@/app/models/Course";
+import { useCurrentRole } from "@/hooks/auth/useCurrentRole";
 
 interface CardProps {
   title: string;
@@ -35,6 +36,7 @@ const CardRedirectForBuyCourses: React.FC<CardProps> = ({
   dateRange,
   courseId,
 }) => {
+  const role = useCurrentRole()
   const [loading, setLoading] = useState(false);
   const [isInWishlist, setIsInWishlist] = useState(false);
   const [showMessage, setShowMessage] = useState(false);
@@ -61,7 +63,11 @@ const CardRedirectForBuyCourses: React.FC<CardProps> = ({
 
   const handleClick = () => {
     setLoading(true);
+    if(role === "STUDENT")
     router.push(`/dashboard/student/courses/${courseId}`);
+    if(role === "ADMIN")
+    router.push(`/dashboard/admin/courses/${courseId}`);
+
   };
 
   const toggleWishlist = async () => {

@@ -78,26 +78,38 @@ const NavbarAdmin: React.FC<{ session?: Session | null |  any }> = ({ session })
             >
               Home
             </button>
-            <button
-              onClick={() => handleNavigation("/dashboard/student/ExploreData")}
-              className={`${
-                pathname === "/ExploreData || /dashboard/student/ExploreData"
-                  ? "underline decoration-2 decoration-white-300"
-                  : ""
-              } hover:underline decoration-2 decoration-white text-white`}
-            >
-              Explore
-            </button> */}
+             */}
             {session && (
               <button
                 onClick={() => handleNavigation("/dashboard/admin")}
                 className={`hover:underline ${
-                  pathname === "/dashboard/admin" ? "text-white" : ""
+                  pathname === "/dashboard/admin" ? "text-white underline decoration-2 decoration-white-300" : ""
                 } hover:underline decoration-2 decoration-white text-white`}
               >
                 Admin Interface
               </button>
             )}
+            <button
+              onClick={() => handleNavigation("/dashboard/admin/ExploreData")}
+              className={`${
+                pathname === "/dashboard/admin/ExploreData"
+                  ? "underline decoration-2 decoration-white-300"
+                  : ""
+              } hover:underline decoration-2 decoration-white text-white`}
+            >
+              Explore
+            </button>
+
+            <button
+              onClick={() => handleNavigation("/dashboard/admin/courses")}
+              className={`${
+                pathname === "/dashboard/admin/courses"
+                  ? "underline decoration-2 decoration-white-300"
+                  : ""
+              } hover:underline decoration-2 decoration-white text-white`}
+            >
+              Courses
+            </button>
           </div>
 
           {/* Right Section */}
@@ -229,6 +241,14 @@ const NavbarAdmin: React.FC<{ session?: Session | null |  any }> = ({ session })
                 ) : (
                   ""
                 )}
+                <button
+                  onClick={() => handleNavigation("/dashboard/admin/ExploreData")}
+                  className={`text-gray-800 hover:text-purple-600 ${
+                    pathname === "/dashboard/admin/ExploreData" ? "font-bold" : ""
+                  }`}
+                >
+                  Explore
+                </button>
                 {!session ? (
                   <div className="flex flex-col space-y-4">
                     <button
