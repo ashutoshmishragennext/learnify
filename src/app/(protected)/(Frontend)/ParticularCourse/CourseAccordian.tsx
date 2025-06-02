@@ -508,6 +508,15 @@ const CourseAccordion: React.FC<CourseAccordionProps> = ({ courseId }) => {
     return null; // Don't show anything if no data exists
   }
 
+  const iframeHTML = `
+    <iframe 
+      id="odysee-iframe" 
+      style="width:100%; aspect-ratio:16 / 9;" 
+      src="https://odysee.com/%24/embed/%40TheBigOCommunity%3A6%2FHands-on-NextJS-15-by-atuld-Full-Stack-Web-Development-with-NodeJS%3A2?r=gSn8n3SBqpnqt4Uih6wi34RPbY32gToM" 
+      allowfullscreen>
+    </iframe>
+  `;
+
   // If a video is selected, show the video player
   if (selectedVideo) {
     return (
@@ -531,6 +540,7 @@ const CourseAccordion: React.FC<CourseAccordionProps> = ({ courseId }) => {
           </div>
           
           <div className="aspect-video bg-black rounded-lg overflow-hidden">
+            { selectedVideo.videoLecture.startsWith("https://res.cloudinary.com") &&
             <video
               controls
               className="w-full h-full"
@@ -539,6 +549,16 @@ const CourseAccordion: React.FC<CourseAccordionProps> = ({ courseId }) => {
             >
               Your browser does not support the video tag.
             </video>
+          }
+            { selectedVideo.videoLecture.startsWith("https://odysee.com") && 
+              <iframe
+              id="odysee-iframe"
+              className="w-full aspect-video"
+              src= {selectedVideo.videoLecture}
+              allowFullScreen
+              title= {selectedVideo.sModuleTitle}
+            />
+            }
           </div>
         </div>
       </div>
