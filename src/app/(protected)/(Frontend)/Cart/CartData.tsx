@@ -65,7 +65,7 @@ const CartPage : React.FC<{ session?: Session | null }> = ({ session }) => {
       );
       setCart(updatedCart);
       toast.info("Redirecting to Dashboard!");
-      router.push("/DashBoard");
+      router.push("/dashboard");
     }
     else{
       setProcessingCourse(null);
