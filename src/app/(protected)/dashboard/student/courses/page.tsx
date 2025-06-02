@@ -2,13 +2,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-// import Card from "./Card";
-// import Footer from "../Footer/page";
 import { Session } from "next-auth";
 import { ICourse } from "@/app/models/Course";
-// import { useSession } from "next-auth/react";
 import Footer from "@/app/(protected)/(Frontend)/Footer/page";
 import CardRedirectForBuyCourses from "@/app/(protected)/(Frontend)/ExploreData/CardRedirectForBuyCourses";
+import { auth } from "../../../../../../auth";
 
 interface Course {
   id: number;
@@ -23,7 +21,8 @@ interface Course {
   category: string;
 }
 
-const Courses: React.FC<{ session?: Session | null }> = ({session}) => {
+const Courses: React.FC = () => {
+  const [session , setSession] = useState<Session | null>();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [activeCategory, setActiveCategory] = useState<string>("All Programmes");
@@ -32,6 +31,8 @@ const Courses: React.FC<{ session?: Session | null }> = ({session}) => {
 
   const fetchCourses = async () => {
     try {
+      const auth2 = await auth();
+      setSession(auth2);
       const response = await fetch("/api/userCourses");
       const data = await response.json();
       if (data.length > 0) {
