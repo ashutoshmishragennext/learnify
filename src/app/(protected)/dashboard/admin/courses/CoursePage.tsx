@@ -112,7 +112,7 @@ const Courses: React.FC<{ session?: Session | null |  any }> = ({ session }) => 
         {loading ? (
           <div className="text-center text-lg">Loading courses...</div>
         ) : filteredCourses.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mx-auto gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mx-auto gap-6">
             {session && filteredCourses.map((course) => (
               <CardRedirectForBuyCourses
                 key={course.id}

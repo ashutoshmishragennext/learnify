@@ -110,7 +110,9 @@ const CardRedirectForBuyCourses: React.FC<CardProps> = ({
   };
 
   return (
-    <div className="w-full max-w-[360px]  bg-white rounded-lg shadow-lg border hover:shadow-xl transform hover:scale-105 transition-transform duration-300 flex flex-col mx-auto relative font-sans">
+    <div               
+      onClick={handleClick}
+      className="w-full max-w-[360px]  bg-white rounded-lg cursor-pointer shadow-lg border hover:shadow-xl transform hover:scale-105 transition-transform duration-300 flex flex-col mx-auto relative font-sans">
       {/* Image Section */}
       <div className="relative">
         <Image
@@ -157,7 +159,6 @@ const CardRedirectForBuyCourses: React.FC<CardProps> = ({
             )}
             <button
               className="px-5 py-2 text-white text-sm font-medium rounded-md hover:bg-purple-700 shadow bg-[#907CFF]"
-              onClick={handleClick}
             >
               {loading ? "Loading..." : buttonLabel}
             </button>
