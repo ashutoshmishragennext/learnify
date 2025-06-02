@@ -6,7 +6,7 @@ import CourseAccordion from '@/app/(protected)/(Frontend)/ParticularCourse/Cours
 import { useParams } from 'next/navigation';
 import React from 'react'
 
-const StudentCourse = async () => {
+const StudentCourse = () => {
   const { courseId } = useParams();
     
   if(!courseId) 
