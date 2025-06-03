@@ -20,9 +20,9 @@ const sidebarConfig = {
       items: [
           // const tabs = ["Card Template", "Intro Page", "Breakdown"];
 
-        { label: "New Course", icon: <BsInbox className="text-lg" />, href: "/New course" },
-        { label: "Course Introduction", icon: <BsInbox className="text-lg" />, href: "/rewards" },
-        { label: "Course Content", icon: <BsBook className="text-lg" />, href: "/assignments" },
+        { label: "New Course", icon: <BsInbox className="text-lg" /> },
+        { label: "Course Introduction", icon: <BsInbox className="text-lg" /> },
+        { label: "Course Content", icon: <BsBook className="text-lg" /> },
         
         
       ],
@@ -33,7 +33,12 @@ const sidebarConfig = {
   ],
 };
 
-const Sidebar: React.FC = () => {
+interface Props {
+    setActiveTabIndex : (index:number)=> void;
+    activeTabIndex : number;
+}
+
+const Sidebar2: React.FC<Props> = ({setActiveTabIndex , activeTabIndex}) => {
   const pathname = usePathname(); // Get the current path
 
   return (
@@ -53,13 +58,14 @@ const Sidebar: React.FC = () => {
             <h3 className="text-gray-400 text-sm uppercase mb-4">{section.title}</h3>
             <ul className="space-y-2">
               {section.items.map((item, itemIndex) => {
-                const isActive = pathname === item.href; // Check if the link is active
                 return (
                   <li key={itemIndex}>
-                    <Link href={item.href}>
                       <div
+                      onClick={()=> {
+                        setActiveTabIndex(itemIndex);
+                      }}
                         className={`flex items-center space-x-3 p-2 rounded-lg cursor-pointer transition ${
-                          isActive
+                          activeTabIndex === itemIndex
                             ? "text-purple-600  font-semibold"
                             : "hover:bg-purple-100 text-gray-800"
                         }`}
@@ -67,7 +73,6 @@ const Sidebar: React.FC = () => {
                         {item.icon}
                         <span>{item.label}</span>
                       </div>
-                    </Link>
                   </li>
                 );
               })}
@@ -77,7 +82,7 @@ const Sidebar: React.FC = () => {
       </div>
 
       {/* Bottom Section */}
-      <div className="fixed bottom-0 left-0 w-64 bg-white border-t border-gray-200 p-6">
+      <div className=" absolute bottom-0 left-0 w-64 bg-white border-t border-gray-200 p-6">
   <ul className="space-y-2">
     {/* Settings Link */}
     {sidebarConfig.accountSection.map((item, itemIndex) => {
@@ -115,4 +120,4 @@ const Sidebar: React.FC = () => {
   );
 };
 
-export default Sidebar;
+export default Sidebar2;

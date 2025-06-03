@@ -10,7 +10,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -22,7 +28,7 @@ import {
   Plus,
   Settings,
   User,
-  Video
+  Video,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -30,7 +36,7 @@ import { toast } from "react-toastify";
 interface Course {
   courseId: string;
   _id: string;
-  current : string;
+  current: string;
   name: string;
   image: string;
   userId: string;
@@ -127,7 +133,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
   uploadType,
   disabled = false,
   showUrlInput = false, // Default to false
-
 }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [fileName, setFileName] = useState<string>("");
@@ -142,30 +147,48 @@ const FileUpload: React.FC<FileUploadProps> = ({
     setUrlInput(url);
     onFileUpload(url);
   };
-  
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    console.log("file type",file.type ,      acceptedTypes.split('/').some(type => 
-      file.type.includes(type.trim()) || file.name.toLowerCase().includes(type.trim())
-    )
-);
-    
-    // Validate file type
-    const isValidType = acceptedTypes.split('/').some(type => 
-      file.type.includes(type.trim()) || file.name.toLowerCase().includes(type.trim())
+    console.log(
+      "file type",
+      file.type,
+      acceptedTypes
+        .split("/")
+        .some(
+          (type) =>
+            file.type.includes(type.trim()) ||
+            file.name.toLowerCase().includes(type.trim())
+        )
     );
-    
+
+    // Validate file type
+    const isValidType = acceptedTypes
+      .split("/")
+      .some(
+        (type) =>
+          file.type.includes(type.trim()) ||
+          file.name.toLowerCase().includes(type.trim())
+      );
+
     if (!isValidType) {
       toast.error(`Please upload a valid ${uploadType} file`);
       return;
     }
 
     // Validate file size (max 100MB for videos, 10MB for documents)
-    const maxSize = uploadType === "video" ? 100 * 1024 * 1024 : 10 * 1024 * 1024;
+    const maxSize =
+      uploadType === "video" ? 100 * 1024 * 1024 : 10 * 1024 * 1024;
     if (file.size > maxSize) {
-      toast.error(`File size should be less than ${uploadType === "video" ? "100MB" : "10MB"}`);
+      toast.error(
+        `File size should be less than ${
+          uploadType === "video" ? "100MB" : "10MB"
+        }`
+      );
       return;
     }
 
@@ -192,10 +215,14 @@ const FileUpload: React.FC<FileUploadProps> = ({
       );
 
       const data = await response.json();
-      
+
       if (data.secure_url) {
         onFileUpload(data.secure_url);
-        toast.success(`${uploadType === "video" ? "Video" : "Document"} uploaded successfully!`);
+        toast.success(
+          `${
+            uploadType === "video" ? "Video" : "Document"
+          } uploaded successfully!`
+        );
       } else {
         throw new Error("Upload failed");
       }
@@ -256,7 +283,7 @@ const CoursePage: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [newCategory, setNewCategory] = useState("");
-  
+
   const [formData, setFormData] = useState<FormData>({
     courseId: "",
     demo: "",
@@ -329,37 +356,37 @@ const CoursePage: React.FC = () => {
       //   }
       // }
 
-      const course = courses.find(c => c.courseId === courseId);
-  
-  if (!course) {
-    console.error('Course not found with courseId:', courseId);
-    return;
-  }
+      const course = courses.find((c) => c.courseId === courseId);
 
-  // Map API response to formData structure
-  setFormData({
-    courseId: course.courseId || "",
-    demo: course.mediaContent?.[0]?.url || "", // Taking first media content as demo
-    courseHeading: course.courseHeading || "",
-    longDescription: course.largeDescription?.intro || "",
-    subPoints: course.largeDescription?.subPoints || [],
-    category: course.category || "WEB",
-    certificateProvider: course.certificate === "true",
-    lifetimeAccess: course.lifeTimeAccess === "true",
-    level: course.level || "Beginner",
-    tags: course.tags || [],
-    prerequisite: course.prerequisites || [],
-    requirement: course.requirements || [],
-    publisherName: course.authors?.[0]?.name || "",
-    publisherBio: course.authors?.[0]?.bio || "",
-    publisherDescription: course.authors?.[0]?.description || "",
-    publisherProfileImage: course.authors?.[0]?.profileImage || "",
-    subtitles: course.subtitles?.[0]?.available === "true",
-    subtitlesLanguage: course.subtitles?.[0]?.language || "English",
-    numberOfAssignments: course.totalAssignments || 0,
-    numberOfVideoLectures: course.totalVideoLectures || 0,
-    syllabus: course.syllabus || "",
-  });
+      if (!course) {
+        console.error("Course not found with courseId:", courseId);
+        return;
+      }
+
+      // Map API response to formData structure
+      setFormData({
+        courseId: course.courseId || "",
+        demo: course.mediaContent?.[0]?.url || "", // Taking first media content as demo
+        courseHeading: course.courseHeading || "",
+        longDescription: course.largeDescription?.intro || "",
+        subPoints: course.largeDescription?.subPoints || [],
+        category: course.category || "WEB",
+        certificateProvider: course.certificate === "true",
+        lifetimeAccess: course.lifeTimeAccess === "true",
+        level: course.level || "Beginner",
+        tags: course.tags || [],
+        prerequisite: course.prerequisites || [],
+        requirement: course.requirements || [],
+        publisherName: course.authors?.[0]?.name || "",
+        publisherBio: course.authors?.[0]?.bio || "",
+        publisherDescription: course.authors?.[0]?.description || "",
+        publisherProfileImage: course.authors?.[0]?.profileImage || "",
+        subtitles: course.subtitles?.[0]?.available === "true",
+        subtitlesLanguage: course.subtitles?.[0]?.language || "English",
+        numberOfAssignments: course.totalAssignments || 0,
+        numberOfVideoLectures: course.totalVideoLectures || 0,
+        syllabus: course.syllabus || "",
+      });
     } catch (error) {
       console.error("Error selecting course intro data:", error);
     }
@@ -374,9 +401,9 @@ const CoursePage: React.FC = () => {
   const handleCourseSelect = (courseId: string) => {
     setSelectedCourseId(courseId);
     console.log(courseId);
-    
-    setFormData(prev => ({ ...prev, courseId }));
-    
+
+    setFormData((prev) => ({ ...prev, courseId }));
+
     // Try to fetch existing course intro data
     if (courseId) {
       fetchCourseIntroData(courseId);
@@ -385,13 +412,13 @@ const CoursePage: React.FC = () => {
 
   // Handle form input changes
   const handleInputChange = (field: keyof FormData, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   // Handle array inputs (tags, prerequisites, etc.)
   const handleArrayInput = (field: keyof FormData, value: string) => {
-    const arrayValue = value.split(',').filter(Boolean);
-    setFormData(prev => ({ ...prev, [field]: arrayValue }));
+    const arrayValue = value.split(",").filter(Boolean);
+    setFormData((prev) => ({ ...prev, [field]: arrayValue }));
   };
 
   // Add new category
@@ -414,8 +441,8 @@ const CoursePage: React.FC = () => {
       });
 
       if (response.ok) {
-        setCategories(prev => [...prev, newCategory]);
-        setFormData(prev => ({ ...prev, category: newCategory }));
+        setCategories((prev) => [...prev, newCategory]);
+        setFormData((prev) => ({ ...prev, category: newCategory }));
         setNewCategory("");
         toast.success("Category added successfully!");
       }
@@ -448,7 +475,9 @@ const CoursePage: React.FC = () => {
 
       if (response.ok) {
         const data = await response.json();
-        toast.success(data.message || "Course introduction saved successfully!");
+        toast.success(
+          data.message || "Course introduction saved successfully!"
+        );
       } else {
         const errorData = await response.json();
         toast.error(errorData.message || "Failed to save course introduction");
@@ -469,7 +498,9 @@ const CoursePage: React.FC = () => {
             <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
             <div>
               <h3 className="text-lg font-semibold">Loading your courses...</h3>
-              <p className="text-gray-600">Please wait while we fetch your data</p>
+              <p className="text-gray-600">
+                Please wait while we fetch your data
+              </p>
             </div>
           </div>
         </Card>
@@ -479,7 +510,7 @@ const CoursePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-6">
-      <div className="max-w-6xl mx-auto space-y-6">
+      <div className="max-w-7xl mx-auto space-y-6">
         {/* Course Selection */}
         <Card className="shadow-lg border-0 bg-gradient-to-br from-white to-gray-50">
           <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-lg">
@@ -493,13 +524,19 @@ const CoursePage: React.FC = () => {
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
-                  No courses found. Please create a course card first before setting up the introduction.
+                  No courses found. Please create a course card first before
+                  setting up the introduction.
                 </AlertDescription>
               </Alert>
             ) : (
               <div className="space-y-4">
-                <Label className="text-lg font-semibold">Choose a course:</Label>
-                <Select value={selectedCourseId} onValueChange={handleCourseSelect }>
+                <Label className="text-lg font-semibold">
+                  Choose a course:
+                </Label>
+                <Select
+                  value={selectedCourseId}
+                  onValueChange={handleCourseSelect}
+                >
                   <SelectTrigger className="h-12">
                     <SelectValue placeholder="Select a course to add introduction details" />
                   </SelectTrigger>
@@ -507,8 +544,8 @@ const CoursePage: React.FC = () => {
                     {courses.map((course) => (
                       <SelectItem key={course.courseId} value={course.courseId}>
                         <div className="flex items-center gap-3">
-                          <img 
-                            src={course.image} 
+                          <img
+                            src={course.image}
                             alt={course.name}
                             className="w-10 h-10 rounded object-cover"
                           />
@@ -540,29 +577,33 @@ const CoursePage: React.FC = () => {
               </CardHeader>
               <CardContent className="p-6 space-y-6">
                 {/* Demo Video Upload */}
-<div className="space-y-3">
-  <Label className="text-lg font-semibold flex items-center gap-2">
-    <Video className="w-4 h-4" />
-    Demo Video <span className="text-red-500">*</span>
-  </Label>
-  <FileUpload
-    onFileUpload={(url) => handleInputChange("demo", url)}
-    currentFileUrl={formData.demo}
-    acceptedTypes="video/*"
-    uploadType="video"
-    disabled={isSaving}
-    showUrlInput={true} // Enable URL input for demo videos
-  />
-</div>
+                <div className="space-y-3">
+                  <Label className="text-lg font-semibold flex items-center gap-2">
+                    <Video className="w-4 h-4" />
+                    Demo Video <span className="text-red-500">*</span>
+                  </Label>
+                  <FileUpload
+                    onFileUpload={(url) => handleInputChange("demo", url)}
+                    currentFileUrl={formData.demo}
+                    acceptedTypes="video/*"
+                    uploadType="video"
+                    disabled={isSaving}
+                    showUrlInput={true} // Enable URL input for demo videos
+                  />
+                </div>
                 <Separator />
 
                 {/* Course Details */}
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-3">
-                    <Label className="font-semibold">Course Heading <span className="text-red-500">*</span></Label>
+                    <Label className="font-semibold">
+                      Course Heading <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                       value={formData.courseHeading}
-                      onChange={(e) => handleInputChange("courseHeading", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("courseHeading", e.target.value)
+                      }
                       placeholder="Enter course heading"
                       className="h-12"
                     />
@@ -572,16 +613,20 @@ const CoursePage: React.FC = () => {
                     <Label className="font-semibold flex items-center gap-2 mt-2">
                       Level <span className="text-red-500">*</span>
                     </Label>
-                    <Select 
-                      value={formData.level} 
-                      onValueChange={(value : any) => handleInputChange("level", value)}
+                    <Select
+                      value={formData.level}
+                      onValueChange={(value: any) =>
+                        handleInputChange("level", value)
+                      }
                     >
                       <SelectTrigger className="h-12">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="Beginner">Beginner</SelectItem>
-                        <SelectItem value="Intermediate">Intermediate</SelectItem>
+                        <SelectItem value="Intermediate">
+                          Intermediate
+                        </SelectItem>
                         <SelectItem value="Advanced">Advanced</SelectItem>
                       </SelectContent>
                     </Select>
@@ -590,10 +635,14 @@ const CoursePage: React.FC = () => {
 
                 {/* Long Description */}
                 <div className="space-y-3">
-                  <Label className="font-semibold">Course Description <span className="text-red-500">*</span></Label>
+                  <Label className="font-semibold">
+                    Course Description <span className="text-red-500">*</span>
+                  </Label>
                   <Textarea
                     value={formData.longDescription}
-                    onChange={(e) => handleInputChange("longDescription", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("longDescription", e.target.value)
+                    }
                     placeholder="Provide a detailed description of the course..."
                     className="min-h-[120px] resize-none"
                   />
@@ -605,9 +654,11 @@ const CoursePage: React.FC = () => {
                     Category <span className="text-red-500">*</span>
                   </Label>
                   <div className="flex gap-2">
-                    <Select 
-                      value={formData.category} 
-                      onValueChange={(value : any) => handleInputChange("category", value)}
+                    <Select
+                      value={formData.category}
+                      onValueChange={(value: any) =>
+                        handleInputChange("category", value)
+                      }
                     >
                       <SelectTrigger className="h-12">
                         <SelectValue />
@@ -646,7 +697,9 @@ const CoursePage: React.FC = () => {
                     {formData.tags.length > 0 && (
                       <div className="flex flex-wrap gap-2">
                         {formData.tags.map((tag, index) => (
-                          <Badge key={index} variant="secondary">{tag}</Badge>
+                          <Badge key={index} variant="secondary">
+                            {tag}
+                          </Badge>
                         ))}
                       </div>
                     )}
@@ -655,14 +708,18 @@ const CoursePage: React.FC = () => {
                   <div className="space-y-3">
                     <Label className="font-semibold">Prerequisites</Label>
                     <Input
-                      onChange={(e) => handleArrayInput("prerequisite", e.target.value)}
+                      onChange={(e) =>
+                        handleArrayInput("prerequisite", e.target.value)
+                      }
                       placeholder="Enter prerequisites separated by commas"
                       className="h-12"
                     />
                     {formData.prerequisite.length > 0 && (
                       <div className="flex flex-wrap gap-2">
                         {formData.prerequisite.map((prereq, index) => (
-                          <Badge key={index} variant="outline">{prereq}</Badge>
+                          <Badge key={index} variant="outline">
+                            {prereq}
+                          </Badge>
                         ))}
                       </div>
                     )}
@@ -674,14 +731,18 @@ const CoursePage: React.FC = () => {
                   <div className="space-y-3">
                     <Label className="font-semibold">Requirements</Label>
                     <Input
-                      onChange={(e) => handleArrayInput("requirement", e.target.value)}
+                      onChange={(e) =>
+                        handleArrayInput("requirement", e.target.value)
+                      }
                       placeholder="Enter requirements separated by commas"
                       className="h-12"
                     />
                     {formData.requirement.length > 0 && (
                       <div className="flex flex-wrap gap-2">
                         {formData.requirement.map((prereq, index) => (
-                          <Badge key={index} variant="outline">{prereq}</Badge>
+                          <Badge key={index} variant="outline">
+                            {prereq}
+                          </Badge>
                         ))}
                       </div>
                     )}
@@ -690,14 +751,18 @@ const CoursePage: React.FC = () => {
                   <div className="space-y-3">
                     <Label className="font-semibold">Key Learning Points</Label>
                     <Input
-                      onChange={(e) => handleArrayInput("subPoints", e.target.value)}
+                      onChange={(e) =>
+                        handleArrayInput("subPoints", e.target.value)
+                      }
                       placeholder="Enter key points separated by commas"
                       className="h-12"
                     />
                     {formData.subPoints.length > 0 && (
                       <div className="flex flex-wrap gap-2">
                         {formData.subPoints.map((prereq, index) => (
-                          <Badge key={index} variant="outline">{prereq}</Badge>
+                          <Badge key={index} variant="outline">
+                            {prereq}
+                          </Badge>
                         ))}
                       </div>
                     )}
@@ -707,10 +772,17 @@ const CoursePage: React.FC = () => {
                 {/* Course Features */}
                 <div className="grid md:grid-cols-3 gap-6">
                   <div className="space-y-3">
-                    <Label className="font-semibold">Certificate Provider</Label>
-                    <Select 
-                      value={formData.certificateProvider ? "Yes" : "No"} 
-                      onValueChange={(value : any) => handleInputChange("certificateProvider", value === "Yes")}
+                    <Label className="font-semibold">
+                      Certificate Provider
+                    </Label>
+                    <Select
+                      value={formData.certificateProvider ? "Yes" : "No"}
+                      onValueChange={(value: any) =>
+                        handleInputChange(
+                          "certificateProvider",
+                          value === "Yes"
+                        )
+                      }
                     >
                       <SelectTrigger className="h-12">
                         <SelectValue />
@@ -724,9 +796,11 @@ const CoursePage: React.FC = () => {
 
                   <div className="space-y-3">
                     <Label className="font-semibold">Lifetime Access</Label>
-                    <Select 
-                      value={formData.lifetimeAccess ? "Yes" : "No"} 
-                      onValueChange={(value : any) => handleInputChange("lifetimeAccess", value === "Yes")}
+                    <Select
+                      value={formData.lifetimeAccess ? "Yes" : "No"}
+                      onValueChange={(value: any) =>
+                        handleInputChange("lifetimeAccess", value === "Yes")
+                      }
                     >
                       <SelectTrigger className="h-12">
                         <SelectValue />
@@ -740,9 +814,11 @@ const CoursePage: React.FC = () => {
 
                   <div className="space-y-3">
                     <Label className="font-semibold">Subtitles Available</Label>
-                    <Select 
-                      value={formData.subtitles ? "Yes" : "No"} 
-                      onValueChange={(value : any) => handleInputChange("subtitles", value === "Yes")}
+                    <Select
+                      value={formData.subtitles ? "Yes" : "No"}
+                      onValueChange={(value: any) =>
+                        handleInputChange("subtitles", value === "Yes")
+                      }
                     >
                       <SelectTrigger className="h-12">
                         <SelectValue />
@@ -759,9 +835,11 @@ const CoursePage: React.FC = () => {
                 {formData.subtitles && (
                   <div className="space-y-3">
                     <Label className="font-semibold">Subtitle Language</Label>
-                    <Select 
-                      value={formData.subtitlesLanguage} 
-                      onValueChange={(value : any) => handleInputChange("subtitlesLanguage", value)}
+                    <Select
+                      value={formData.subtitlesLanguage}
+                      onValueChange={(value: any) =>
+                        handleInputChange("subtitlesLanguage", value)
+                      }
                     >
                       <SelectTrigger className="h-12">
                         <SelectValue />
@@ -788,9 +866,13 @@ const CoursePage: React.FC = () => {
               <CardContent className="p-6 space-y-6">
                 {/* Publisher Profile Image */}
                 <div className="space-y-3">
-                  <Label className="font-semibold">Publisher Profile Image</Label>
+                  <Label className="font-semibold">
+                    Publisher Profile Image
+                  </Label>
                   <ImageUpload
-                    onImageUpload={(url) => handleInputChange("publisherProfileImage", url)}
+                    onImageUpload={(url) =>
+                      handleInputChange("publisherProfileImage", url)
+                    }
                     currentImageUrl={formData.publisherProfileImage}
                     disabled={isSaving}
                   />
@@ -799,10 +881,14 @@ const CoursePage: React.FC = () => {
                 {/* Publisher Details */}
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-3">
-                    <Label className="font-semibold">Publisher Name <span className="text-red-500">*</span></Label>
+                    <Label className="font-semibold">
+                      Publisher Name <span className="text-red-500">*</span>
+                    </Label>
                     <Input
                       value={formData.publisherName}
-                      onChange={(e) => handleInputChange("publisherName", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("publisherName", e.target.value)
+                      }
                       placeholder="Enter publisher name"
                       className="h-12"
                     />
@@ -812,7 +898,9 @@ const CoursePage: React.FC = () => {
                     <Label className="font-semibold">Publisher Bio</Label>
                     <Input
                       value={formData.publisherBio}
-                      onChange={(e) => handleInputChange("publisherBio", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("publisherBio", e.target.value)
+                      }
                       placeholder="Brief bio or title"
                       className="h-12"
                     />
@@ -823,7 +911,9 @@ const CoursePage: React.FC = () => {
                   <Label className="font-semibold">Publisher Description</Label>
                   <Textarea
                     value={formData.publisherDescription}
-                    onChange={(e) => handleInputChange("publisherDescription", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("publisherDescription", e.target.value)
+                    }
                     placeholder="Detailed description about the publisher..."
                     className="min-h-[100px] resize-none"
                   />
@@ -843,24 +933,38 @@ const CoursePage: React.FC = () => {
                 {/* Course Numbers */}
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-3">
-                    <Label className="font-semibold">Number of Assignments</Label>
+                    <Label className="font-semibold">
+                      Number of Assignments
+                    </Label>
                     <Input
                       type="number"
                       min="0"
                       value={formData.numberOfAssignments}
-                      onChange={(e) => handleInputChange("numberOfAssignments", parseInt(e.target.value) || 0)}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "numberOfAssignments",
+                          parseInt(e.target.value) || 0
+                        )
+                      }
                       placeholder="0"
                       className="h-12"
                     />
                   </div>
 
                   <div className="space-y-3">
-                    <Label className="font-semibold">Number of Video Lectures</Label>
+                    <Label className="font-semibold">
+                      Number of Video Lectures
+                    </Label>
                     <Input
                       type="number"
                       min="0"
                       value={formData.numberOfVideoLectures}
-                      onChange={(e) => handleInputChange("numberOfVideoLectures", parseInt(e.target.value) || 0)}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "numberOfVideoLectures",
+                          parseInt(e.target.value) || 0
+                        )
+                      }
                       placeholder="0"
                       className="h-12"
                     />
@@ -871,7 +975,8 @@ const CoursePage: React.FC = () => {
                 <div className="space-y-3">
                   <Label className="text-lg font-semibold flex items-center gap-2">
                     <FileText className="w-4 h-4" />
-                    Course Syllabus (PDF) <span className="text-red-500">*</span>
+                    Course Syllabus (PDF){" "}
+                    <span className="text-red-500">*</span>
                   </Label>
                   <FileUpload
                     onFileUpload={(url) => handleInputChange("syllabus", url)}
