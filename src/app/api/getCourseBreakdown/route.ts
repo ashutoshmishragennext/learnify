@@ -33,7 +33,8 @@ export async function GET(req: NextRequest) {
     // Transform modules to match the required response format
     const courseBreakdown = course.modules.map((module: any) => {
       // Helper function to convert duration from seconds to hours, minutes, seconds
-      const convertDuration = (durationInSeconds: number) => {
+      const convertDuration = (durationInHours: number) => {
+        const durationInSeconds = durationInHours * 3600;
         const hours = Math.floor(durationInSeconds / 3600);
         const minutes = Math.floor((durationInSeconds % 3600) / 60);
         const seconds = durationInSeconds % 60;

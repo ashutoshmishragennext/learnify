@@ -44,7 +44,7 @@ export async function POST(req: Request) {
       const subModules = (module.subModules || []).map((sub: any) => ({
         sModuleNumber: Number(sub.partNumber) || 0,
         sModuleTitle: sub.partName || '',
-        sModuleDuration: Number((sub.duration/60/60).toFixed(3)) || 0,
+        sModuleDuration: Number((sub.duration)) || 0,
         videoLecture: sub.videoLecture || '',
       }));
 
