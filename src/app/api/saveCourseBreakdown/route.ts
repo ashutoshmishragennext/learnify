@@ -35,7 +35,7 @@ export async function POST(req: Request) {
     // Transform modules data to match schema
     const modules = data.modules.map((module: any, index: number) => {
       const reward = Number(module.reward) || 0;
-      const moduleDuration = Number(module.duration) || 0;
+      const moduleDuration = Number((module.duration/60/60).toFixed(3)) || 0;
       
       rewardsArray.push(reward);
       totalDuration += moduleDuration;
@@ -44,7 +44,7 @@ export async function POST(req: Request) {
       const subModules = (module.subModules || []).map((sub: any) => ({
         sModuleNumber: Number(sub.partNumber) || 0,
         sModuleTitle: sub.partName || '',
-        sModuleDuration: Number(sub.duration) || 0,
+        sModuleDuration: Number((sub.duration/60/60).toFixed(3)) || 0,
         videoLecture: sub.videoLecture || '',
       }));
 

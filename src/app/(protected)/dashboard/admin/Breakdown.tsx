@@ -618,7 +618,7 @@ const Breakdown: React.FC = () => {
                           <div>
                             <p className="font-semibold">{course.name}</p>
                             <p className="text-sm text-gray-600">
-                              ${course.current} • {course.duration}h
+                              {course.current} • {course.duration}h
                             </p>
                           </div>
                         </div>
