@@ -51,11 +51,11 @@ const Signup = () => {
   });
 
   const handleGithubSignIn = () => {
-    signIn("github", { callbackUrl: "/DashBoard" });
+    signIn("github", { callbackUrl: "/dashboard" });
   };
 
   const handleGoogleSignIn = () => {
-    signIn("google", { callbackUrl: "/DashBoard" });
+    signIn("google", { callbackUrl: "/dashboard" });
   };
 
   const handleLoader = () => {
