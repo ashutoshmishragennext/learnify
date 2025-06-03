@@ -90,14 +90,26 @@ const CourseContentData: React.FC<CoursePageProps> = ({ course }) => {
             ) : (
               <div className="space-y-4">
                 <div className="aspect-video rounded-lg overflow-hidden shadow-lg">
-                  <video
+                  {demoVideo.startsWith("https://res.cloudinary.com") &&
+                    <video
                     controls
+                    autoPlay
                     className="w-full h-full object-cover"
                     poster="/api/placeholder/800/450"
                   >
                     <source src={demoVideo} type="video/mp4" />
                     Your browser does not support the video tag.
                   </video>
+                  }
+                    { demoVideo.startsWith("https://odysee.com") && 
+                      <iframe
+                      id="odysee-iframe"
+                      className="w-full aspect-video"
+                      src= {demoVideo}
+                      allowFullScreen
+                      // title= {selectedVideo.sModuleTitle}
+                    />
+                    }
                 </div>
                 
                 <div className="flex justify-between items-center">
