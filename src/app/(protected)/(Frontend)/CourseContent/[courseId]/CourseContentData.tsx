@@ -49,10 +49,10 @@ const CourseContentData: React.FC<CoursePageProps> = ({ course }) => {
           <div className="p-6">
             {!showVideo ? (
               <div className="relative">
-                <div className="aspect-video  bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex items-center justify-center relative overflow-hidden">
+                <div className="aspect-video h-full  bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex items-center justify-center relative overflow-hidden">
                   {/* Background pattern */}
                   <div className="absolute inset-0 opacity-10">
-                    <div className="grid grid-cols-8 grid-rows-6 h-full">
+                    <div className="grid grid-cols-8 grid-rows-6 h-full ">
                       {Array.from({ length: 48 }).map((_, i) => (
                         <div key={i} className="border border-white/20"></div>
                       ))}
