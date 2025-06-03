@@ -157,7 +157,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FaUserCircle } from "react-icons/fa";
 import { AiOutlineBell, AiOutlineMail, AiOutlineSetting, AiOutlineClose } from "react-icons/ai";
-import { signOut } from "next-auth/react";
+// import { signOut } from "next-auth/react";
 import { Session } from "next-auth";
 import Image from "next/image";
 
@@ -209,7 +209,7 @@ const ProfileSection: React.FC<{ session: Session | null| undefined }> = ({ sess
       if (!res.ok) {
         throw new Error(data.message);
       } else {
-        await signOut();
+        // await signOut();
         setProfileImage(data.imageUrl);
       }
     } catch (error) {
