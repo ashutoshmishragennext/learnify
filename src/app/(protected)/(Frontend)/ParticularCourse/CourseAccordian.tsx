@@ -197,7 +197,7 @@ const CourseAccordion: React.FC<CourseAccordionProps> = ({ courseId }) => {
               {/* Accordion Content */}
               {openModule === module.moduleNumber && module.subModules && (
                 <div className="bg-purple-50 px-6 py-4 space-y-6">
-                  {module.subModules.map((subModule, index) => (
+                  {module.subModules.map((subModule) => (
                     <div key={subModule._id} className="space-y-4">
                       {/* Main Lecture Section */}
                       <div
