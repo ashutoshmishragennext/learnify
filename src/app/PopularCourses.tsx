@@ -12,7 +12,7 @@ const PopularCourses: React.FC<{ session?: Session | null }> = ({ session }) => 
   useEffect(() => {
     const fetchCourses = async () => {
         try {
-            const response = await fetch("/api/courses");
+            const response = await fetch("/api/coursesconcise");
             const result = await response.json();
 
             // Check if response contains the expected data structure
@@ -75,7 +75,6 @@ const PopularCourses: React.FC<{ session?: Session | null }> = ({ session }) => 
             price={course.price.current}
             originalPrice={course.price.original}
             description={course.shortDescription}
-            // dateRange={course.duration}
             buttonLabel="View Detail"
             courseId={course.courseId}
           />
