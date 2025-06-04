@@ -842,7 +842,7 @@ const Breakdown: React.FC = () => {
                                     <div className="flex items-center gap-2">
                                       <Input
                                         type="url"
-                                        placeholder="Enter video URL (YouTube, Vimeo, etc.)"
+                                        placeholder="Enter video URL (Odysee embed link, cloudinary, etc.)"
                                         value={typeof row.videoLecture === 'string' ? row.videoLecture : ''}
                                         onChange={(e) => handleVideoUrlChange(moduleIndex, subIndex, e.target.value)}
                                         className="h-10"

@@ -247,13 +247,13 @@ const FileUpload: React.FC<FileUploadProps> = ({
       {showUrlInput && (
         <div className="space-y-2">
           <Label className="text-sm font-medium text-gray-700">
-            Or paste {uploadType} URL directly:
+            Or paste Odysee iframe {uploadType} URL directly:
           </Label>
           <Input
             type="url"
             value={urlInput}
             onChange={handleUrlInputChange}
-            placeholder={`Paste ${uploadType} URL here...`}
+            placeholder={`Paste Odysee iframe ${uploadType} URL link here...`}
             disabled={isUploading || disabled}
             className="h-10"
           />
