@@ -4,7 +4,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation"; 
-import { BsGear, BsInbox, BsBook, BsBoxArrowRight } from "react-icons/bs";
+import { BsGear, BsInbox, BsBook, BsBoxArrowRight, BsReverseListColumnsReverse } from "react-icons/bs";
 import { signOut } from "next-auth/react";
 
 // Logout handler
@@ -23,6 +23,8 @@ const sidebarConfig = {
         { label: "New Course", icon: <BsInbox className="text-lg" /> },
         { label: "Course Introduction", icon: <BsInbox className="text-lg" /> },
         { label: "Course Content", icon: <BsBook className="text-lg" /> },
+        { label: "Manage Courses", icon: <BsReverseListColumnsReverse className="text-lg" /> },
+
         
         
       ],

@@ -4,6 +4,7 @@ import Breakdown from "./Breakdown";
 import CoursePage from "./CoursePage";
 import CardTemplateForm from "./CardTemplateForm"; // Importing CardTemplateForm
 import Sidebar2 from "./Sidebar2";
+import ManageCourse from "./ManageCourse";
 
 const AdminCoursePage: React.FC = () => {
   const [activeTabIndex, setActiveTabIndex] = useState(0);
@@ -31,6 +32,12 @@ const AdminCoursePage: React.FC = () => {
         {activeTabIndex === 2 && (
           <div>
             <Breakdown />
+          </div>
+        )}
+
+        {activeTabIndex === 3 && (
+          <div>
+            <ManageCourse />
           </div>
         )}
       </main>
