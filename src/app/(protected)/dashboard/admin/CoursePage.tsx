@@ -99,7 +99,7 @@ interface FormData {
   courseHeading: string;
   longDescription: string;
   subPoints: string[];
-  category: string;
+  category: string[]; // Changed from string to string[]
   certificateProvider: boolean;
   lifetimeAccess: boolean;
   level: "Beginner" | "Intermediate" | "Advanced" | string;
@@ -115,6 +115,10 @@ interface FormData {
   numberOfAssignments: number;
   numberOfVideoLectures: number;
   syllabus: string;
+}
+
+interface Category{
+  name : string;
 }
 
 interface FileUploadProps {
@@ -279,7 +283,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
 const CoursePage: React.FC = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [selectedCourseId, setSelectedCourseId] = useState<string>("");
-  const [categories, setCategories] = useState<string[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [newCategory, setNewCategory] = useState("");
@@ -290,7 +294,7 @@ const CoursePage: React.FC = () => {
     courseHeading: "",
     longDescription: "",
     subPoints: [],
-    category: "WEB",
+  category: ["WEB"], // Changed from "WEB" to ["WEB"]
     certificateProvider: false,
     lifetimeAccess: false,
     level: "Beginner",
@@ -370,7 +374,7 @@ const CoursePage: React.FC = () => {
         courseHeading: course.courseHeading || "",
         longDescription: course.largeDescription?.intro || "",
         subPoints: course.largeDescription?.subPoints || [],
-        category: course.category || "WEB",
+        category: Array.isArray(course.category) ? course.category : [course.category || "WEB"], // Handle both string and string[]
         certificateProvider: course.certificate === "true",
         lifetimeAccess: course.lifeTimeAccess === "true",
         level: course.level || "Beginner",
@@ -422,36 +426,73 @@ const CoursePage: React.FC = () => {
   };
 
   // Add new category
+  // const addCategory = async () => {
+  //   if (!newCategory.trim()) {
+  //     toast.error("Please enter a category name");
+  //     return;
+  //   }
+
+  //   if (categories.filter((items)=> items.name === newCategory).length > 0) {
+  //     toast.error("Category already exists");
+  //     return;
+  //   }
+
+  //   try {
+  //     const response = await fetch("/api/courseCategories", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({ category: newCategory }),
+  //     });
+
+  //     if (response.ok) {
+  //       const newCategory2: Category = { name: newCategory };
+
+  //       setCategories((prev) => [...prev, newCategory2]);
+  //       setFormData((prev) => ({ ...prev, category: newCategory }));
+  //       setNewCategory("");
+  //       toast.success("Category added successfully!");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error adding category:", error);
+  //     toast.error("Failed to add category");
+  //   }
+  // };
+
   const addCategory = async () => {
-    if (!newCategory.trim()) {
-      toast.error("Please enter a category name");
-      return;
+  if (!newCategory.trim()) {
+    toast.error("Please enter a category name");
+    return;
+  }
+
+  if (categories.filter((items) => items.name === newCategory).length > 0) {
+    toast.error("Category already exists");
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/courseCategories", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ category: newCategory }),
+    });
+
+    if (response.ok) {
+      const newCategory2: Category = { name: newCategory };
+
+      setCategories((prev) => [...prev, newCategory2]);
+      // Add to selected categories instead of replacing
+      setFormData((prev) => ({ 
+        ...prev, 
+        category: [...prev.category, newCategory] 
+      }));
+      setNewCategory("");
+      toast.success("Category added successfully!");
     }
-
-    if (categories.includes(newCategory)) {
-      toast.error("Category already exists");
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/courseCategories", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ category: newCategory }),
-      });
-
-      if (response.ok) {
-        setCategories((prev) => [...prev, newCategory]);
-        setFormData((prev) => ({ ...prev, category: newCategory }));
-        setNewCategory("");
-        toast.success("Category added successfully!");
-      }
-    } catch (error) {
-      console.error("Error adding category:", error);
-      toast.error("Failed to add category");
-    }
-  };
-
+  } catch (error) {
+    console.error("Error adding category:", error);
+    toast.error("Failed to add category");
+  }
+};
   // Save course introduction
   const handleSave = async () => {
     if (!selectedCourseId) {
@@ -649,42 +690,70 @@ const CoursePage: React.FC = () => {
                 </div>
 
                 {/* Category */}
-                <div className="space-y-3">
-                  <Label className="font-semibold flex items-center gap-2">
-                    Category <span className="text-red-500">*</span>
-                  </Label>
-                  <div className="flex gap-2">
-                    <Select
-                      value={formData.category}
-                      onValueChange={(value: any) =>
-                        handleInputChange("category", value)
-                      }
-                    >
-                      <SelectTrigger className="h-12">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories.map((category) => (
-                          <SelectItem key={category} value={category}>
-                            {category}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <div className="flex gap-2">
-                      <Input
-                        value={newCategory}
-                        onChange={(e) => setNewCategory(e.target.value)}
-                        placeholder="New category"
-                        className="h-12"
-                      />
-                      <Button onClick={addCategory} className="h-12 px-4">
-                        <Plus className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-
+{/* Category - Replace the entire category section */}
+<div className="space-y-3">
+  <Label className="font-semibold flex items-center gap-2">
+    Categories <span className="text-red-500">*</span>
+  </Label>
+  <div className="space-y-3">
+    {/* Multi-select for existing categories */}
+    <div className="space-y-2">
+      <Label className="text-sm">Select Categories</Label>
+      <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto border rounded-md p-2">
+        {categories.map((category) => (
+          <Badge
+            key={category.name}
+            variant={formData.category.includes(category.name) ? "default" : "outline"}
+            className="cursor-pointer"
+            onClick={() => {
+              const isSelected = formData.category.includes(category.name);
+              if (isSelected) {
+                handleInputChange("category", formData.category.filter(c => c !== category.name));
+              } else {
+                handleInputChange("category", [...formData.category, category.name]);
+              }
+            }}
+          >
+            {category.name}
+          </Badge>
+        ))}
+      </div>
+    </div>
+    
+    {/* Add new category */}
+    <div className="flex gap-2">
+      <Input
+        value={newCategory}
+        onChange={(e) => setNewCategory(e.target.value)}
+        placeholder="New category"
+        className="h-12"
+      />
+      <Button onClick={addCategory} className="h-12 px-4">
+        <Plus className="w-4 h-4" />
+      </Button>
+    </div>
+    
+    {/* Selected categories display */}
+    {formData.category.length > 0 && (
+      <div className="space-y-2">
+        <Label className="text-sm">Selected Categories:</Label>
+        <div className="flex flex-wrap gap-2">
+          {formData.category.map((cat, index) => (
+            <Badge key={index} variant="secondary" className="flex items-center gap-1">
+              {cat}
+              <button
+                onClick={() => handleInputChange("category", formData.category.filter(c => c !== cat))}
+                className="ml-1 text-xs hover:text-red-500"
+              >
+                ×
+              </button>
+            </Badge>
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+</div>
                 {/* Tags, Prerequisites, etc. */}
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-3">

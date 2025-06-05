@@ -128,7 +128,7 @@ const Card: React.FC<CardProps> = ({
           {title.substring(0,60)}
         </h3>
 
-        <p className="text-left mb-4 text-[#4D4D4D] h-28">{description?.substring(0,200)}</p>
+        <p className="text-left mb-4 text-[#4D4D4D] h-28">{description?.substring(0,160)}</p>
 
         <div className="flex justify-between items-center mt-auto">
           <div>

@@ -81,7 +81,7 @@ export interface ICourse extends Document {
   ratings: IRating;
   reviews: IReview[];
   rewards: IReward;
-  category: string;
+  category: string[];
   certificate: string;
   lifeTimeAccess: string;
   level: string;
@@ -179,7 +179,7 @@ export const CourseSchema: Schema = new Schema({
   ratings: { type: RatingSchema,  },
   reviews: { type: [ReviewSchema], default: [] },
   rewards: { type: RewardsSchema, },
-  category: { type: String,},
+  category: { type: [String],default:[]},
   certificate: {type: String, required: false},
   lifeTimeAccess: {type: String, required: false},
   level: {type: String, required: false},

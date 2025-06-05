@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -17,7 +16,7 @@ interface Course {
   description: string;
   dateRange?: string;
   courseId: string;
-  category: string;
+  category: string[]; // Changed to array to match API response
 }
 
 const Courses: React.FC<{ session?: Session | null }> = ({ session }) => {
@@ -42,11 +41,18 @@ const Courses: React.FC<{ session?: Session | null }> = ({ session }) => {
           description: course.shortDescription,
           dateRange: course.duration,
           courseId: course.courseId,
-          category: course.category,
+          category: course.category || [], // Handle undefined categories
         }));
         setCourses(formattedCourses);
         
-        const allCategories: string[] = data.data.map((course: ICourse) => course.category);
+        // Extract all unique categories from the array format
+        const allCategories: string[] = [];
+        data.data.forEach((course: ICourse) => {
+          if (course.category && Array.isArray(course.category)) {
+            allCategories.push(...course.category);
+          }
+        });
+        
         const uniqueCategories: string[] = Array.from(new Set(allCategories)).filter(Boolean);
         setCategories(["All Programmes", ...uniqueCategories]);
       }
@@ -61,11 +67,13 @@ const Courses: React.FC<{ session?: Session | null }> = ({ session }) => {
     fetchCourses();
   }, []);
 
-  // Filter courses based on the selected category
+  // Filter courses based on the selected category (updated logic)
   const filteredCourses =
     activeCategory === "All Programmes"
       ? courses
-      : courses.filter((course) => course.category === activeCategory);
+      : courses.filter((course) => 
+          course.category && course.category.includes(activeCategory)
+        );
 
   return (
     <>
@@ -111,7 +119,7 @@ const Courses: React.FC<{ session?: Session | null }> = ({ session }) => {
         {loading ? (
           <div className="text-center text-lg">Loading courses...</div>
         ) : filteredCourses.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredCourses.map((course) => (
               <Card
                 key={course.id}

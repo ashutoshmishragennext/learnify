@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/dbConnect"; 
 import Course from "@/app/models/Course"; 
@@ -12,6 +14,8 @@ export async function POST(req: Request) {
     // calculating the last entered course id in continuation with saveCardTemplate;
 
     const data = await req.json();
+
+
 
     const courseId = await data["courseId"];
     const tags = data["tags"];
@@ -34,6 +38,9 @@ export async function POST(req: Request) {
     const publisherProfileImage = data["publisherProfileImage"]; // Now expecting URL directly
     const numberOfAssignments = data["numberOfAssignments"];
     const numberOfVideoLectures = data["numberOfVideoLectures"];
+
+            console.log("Category data:", category, "Type:", typeof category, "IsArray:", Array.isArray(category));
+
 
     let publisher = await Publisher.findOne({ email: session?.user?.email });    
 
@@ -62,7 +69,7 @@ export async function POST(req: Request) {
     const course = await Course.findOneAndUpdate(
       { courseId: courseId },
       {
-        category: category,
+        category: Array.isArray(category) ? category : [category], // Ensure it's always an array
         level: level,
         courseHeading: courseHeading,
         certificate: certificateProvider,
@@ -107,10 +114,10 @@ export async function POST(req: Request) {
     );
 
     return NextResponse.json({ message: "Course created successfully", course: course }, { status: 201 });
-  } catch (error) {
-    console.log("Error creating course:", error);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
-  }
+  } catch (error:any) {
+   console.error("Detailed error:", error); // Changed this line for better error details
+    return NextResponse.json({ error: "Server error", details: error.message }, { status: 500 });
+   }
 }
 
 export async function PUT(req: Request) {
@@ -166,7 +173,7 @@ export async function PUT(req: Request) {
     const updatedCourse = await Course.findOneAndUpdate(
       { courseId: courseId },
       {
-        category: category,
+        category: Array.isArray(category) ? category : [category], // Ensure it's always an array
         level: level,
         courseHeading: courseHeading,
         certificate: certificateProvider,
