@@ -1,11 +1,8 @@
 import connectDB from "@/lib/dbConnect";
 import Course from "@/app/models/Course";
 import { NextResponse } from "next/server";
-import { auth } from "../../../../auth";
-import User from "@/app/models/User";
 
 export async function GET() {
-  const session = await auth();
   try {
     await connectDB();
 
