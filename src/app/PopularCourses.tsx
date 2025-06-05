@@ -12,7 +12,7 @@ const PopularCourses: React.FC<{ session?: Session | null }> = ({ session }) => 
   useEffect(() => {
     const fetchCourses = async () => {
         try {
-            const response = await fetch("/api/coursesconcise");
+            const response = await fetch("/api/allcourses");
             const result = await response.json();
 
             // Check if response contains the expected data structure

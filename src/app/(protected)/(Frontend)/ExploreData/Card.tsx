@@ -17,7 +17,7 @@ interface CardProps {
   students: number | any;
   price: number;
   originalPrice: number;
-  description:  any;
+  description:  string | undefined ;
   buttonLabel: string;
   dateRange?: string;
   courseId: string;
@@ -125,10 +125,10 @@ const Card: React.FC<CardProps> = ({
         <div className="text-sm font-medium text-gray-500 mb-2">{dateRange}</div>
 
         <h3 className="text-lg font-semibold mb-4 text-left text-[#907CFF]">
-          {title}
+          {title.substring(0,60)}
         </h3>
 
-        <p className="text-left mb-4 text-[#4D4D4D]">{description}</p>
+        <p className="text-left mb-4 text-[#4D4D4D] h-28">{description?.substring(0,200)}</p>
 
         <div className="flex justify-between items-center mt-auto">
           <div>

@@ -10,7 +10,7 @@ export const apiAuthPrefix: string = "/api/auth";
 export const publicRoutes: (string | RegExp)[] = ["/", "/auth/verify-email","/updatingDB/", /^\/verifyEmail\/[a-zA-Z0-9]+$/i ];
 
 // APIs which are accessible to all.
-export const publicApis: string[] = ["/api/uploadthing","/api/emailVerification" , "/api/sendVerificationEmail" ];
+export const publicApis: string[] = ["/api/uploadthing","/api/emailVerification" , "/api/sendVerificationEmail" , "/api/allcourses" ];
 
 // Routes which are used for authentication.
 export const authRoutes: string[] = [
