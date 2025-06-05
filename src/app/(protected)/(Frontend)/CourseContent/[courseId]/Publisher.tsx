@@ -37,7 +37,7 @@ const Publisher: React.FC<PublisherProps> = ({
 
   return (
     <div className="max-w-5xl mx-auto my-8 p-6 bg-white rounded-lg shadow-lg">
-      <h3 className="text-2xl font-bold text-purple-600 mb-6 border-b pb-2">
+      <h3 className="text-2xl text-center font-bold text-purple-600 mb-6 border-b pb-2">
         About Publisher
       </h3>
       <div className="flex flex-col lg:flex-row gap-6">
@@ -80,7 +80,7 @@ const Publisher: React.FC<PublisherProps> = ({
           <p className="text-gray-700 mb-4">
             {showFullDescription
               ? description
-              : `${description.slice(0, 200)}...`}
+              : `${description.slice(0, 80)}...`}
           </p>
           <button
             onClick={toggleDescription}
@@ -119,14 +119,14 @@ const PublishHome: React.FC<CoursePageProps> = ({ course }) => {
   return (
     <div>
       <Publisher
-        name={publisher.name}
-        title={publisher.bio}
-        description={publisher.description}
+        name={course.authors[0].name}
+        title={course.authors[0].bio}
+        description={course.authors[0].description}
         instructorRating={publisher.ratings}
         reviews={publisher.reviews}
         students={publisher.studentsTaught}
         courses={publisher.coursesPublished?.totalCoursesPublished}
-        imageUrl={publisher.image || "/signuppageimage.png"}
+        imageUrl={course.authors[0].profileImage || "/signuppageimage.png"}
       />
     </div>
   );

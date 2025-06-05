@@ -224,7 +224,7 @@ const UserInsightsDashboard: React.FC = () => {
             value={insights.cartItems}
             subtitle="Ready to purchase"
             color="orange"
-            onClick={() => router.push('/cart')}
+            onClick={() => router.push('/Cart')}
           />
           <StatCard
             icon={Heart}
