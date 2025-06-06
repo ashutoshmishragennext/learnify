@@ -1,14 +1,16 @@
-
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { FaPlay } from "react-icons/fa";
+import { FaPlay, FaDownload, FaFileAlt, FaBookOpen, FaArrowLeft } from "react-icons/fa";
 
 interface SubModule {
   sModuleNumber: number;
   sModuleTitle: string;
   sModuleDuration: number;
   videoLecture: string;
+  videoType: string;
+  description: string;
+  attachedPdf: string;
   _id: string;
 }
 
@@ -18,6 +20,7 @@ interface Module {
   moduleDuration: number;
   subModulePart: number;
   reward: number;
+  description: string;
   subModules: SubModule[];
   _id: string;
 }
@@ -45,6 +48,7 @@ const CourseAccordion: React.FC<CourseAccordionProps> = ({ courseId }) => {
   const [data, setData] = useState<CourseData | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedVideo, setSelectedVideo] = useState<SubModule | null>(null);
+  const [courseIncluded, setCourseIncluded] = useState<boolean>(false);
 
   useEffect(() => {
     const getCourseVideos = async () => {
@@ -62,6 +66,7 @@ const CourseAccordion: React.FC<CourseAccordionProps> = ({ courseId }) => {
 
         const responseData: ApiResponse = await response.json();
         setData(responseData.course);
+        setCourseIncluded(responseData.courseIncluded);
       } catch (error) {
         console.error("Error fetching course data:", error);
         setData(null);
@@ -81,81 +86,207 @@ const CourseAccordion: React.FC<CourseAccordionProps> = ({ courseId }) => {
 
   // Convert duration from seconds to minutes
   const formatDuration = (seconds: number): string => {
+    // if (seconds === 0) return "Coming soon";
+    if(seconds === 0) return "0"
     const minutes = Math.round(seconds / 60);
     return `${minutes} minute${minutes !== 1 ? 's' : ''}`;
   };
 
   const handleVideoClick = (subModule: SubModule) => {
-    setSelectedVideo(subModule);
+    if (courseIncluded) {
+      setSelectedVideo(subModule);
+    }
   };
 
   const handleBackToList = () => {
     setSelectedVideo(null);
   };
 
-  // Don't render anything if no data or loading
+  const handlePdfDownload = (pdfUrl: string, title: string) => {
+    const link = document.createElement('a');
+    link.href = pdfUrl;
+    link.download = `${title}.pdf`;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Loading state
   if (loading) {
     return (
       <div className="relative flex flex-col lg:flex-row max-w-screen-xl mx-auto px-4 py-8 gap-8">
         <div className="flex-1 lg:w-2/3">
-          <div className="text-center py-8">Loading course data...</div>
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading course data...</p>
+          </div>
         </div>
       </div>
     );
   }
 
   if (!data || !data.modules || data.modules.length === 0) {
-    return null; // Don't show anything if no data exists
+    return null;
   }
 
-  // If a video is selected, show the video player
+  // Video player view with sidebar
   if (selectedVideo) {
     return (
-      <div className="relative flex flex-col max-w-screen-xl mx-auto px-4 py-8">
-        <div className="mb-4">
+      <div className="relative max-w-screen-xl mx-auto px-4 py-8">
+        {/* Mobile back button */}
+        <div className="lg:hidden mb-4">
           <button
             onClick={handleBackToList}
             className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
           >
-            <span>←</span>
+            <FaArrowLeft />
             <span>Back to Course</span>
           </button>
         </div>
-        
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-2xl font-bold text-purple-800 mb-4">
-            {selectedVideo.sModuleTitle}
-          </h2>
-          <div className="mb-4">
-            <span className="text-gray-600">Duration: {formatDuration(selectedVideo.sModuleDuration)}</span>
+
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Video Section - Left on desktop, full width on mobile */}
+          <div className="flex-1 lg:w-2/3">
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <div className="bg-gradient-to-r from-purple-600 to-purple-700 p-4">
+                <h2 className="text-xl font-bold text-white">
+                  {selectedVideo.sModuleTitle}
+                </h2>
+                <p className="text-purple-100 text-sm mt-1">
+                  Duration: {formatDuration(selectedVideo.sModuleDuration)}
+                </p>
+              </div>
+              
+              <div className="aspect-video bg-black">
+                {selectedVideo.videoLecture.startsWith("https://res.cloudinary.com") && (
+                  <video
+                    controls
+                    className="w-full h-full"
+                    src={selectedVideo.videoLecture}
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                )}
+                {selectedVideo.videoLecture.startsWith("https://odysee.com") && (
+                  <iframe
+                    className="w-full h-full"
+                    src={selectedVideo.videoLecture}
+                    allowFullScreen
+                    title={selectedVideo.sModuleTitle}
+                  />
+                )}
+              </div>
+
+              {/* Description below video on mobile */}
+              <div className="lg:hidden p-6">
+                {selectedVideo.description && (
+                  <div className="mb-4">
+                    <h3 className="font-semibold text-gray-800 mb-2 flex items-center">
+                      <FaBookOpen className="mr-2 text-purple-600" />
+                      Description
+                    </h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      {selectedVideo.description}
+                    </p>
+                  </div>
+                )}
+                
+                {selectedVideo.attachedPdf && (
+                  <button
+                    onClick={() => handlePdfDownload(selectedVideo.attachedPdf, selectedVideo.sModuleTitle)}
+                    className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition w-full justify-center"
+                  >
+                    <FaDownload />
+                    <span>Download PDF Resource</span>
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
-          
-          <div className="aspect-video bg-black rounded-lg overflow-hidden">
-            { selectedVideo.videoLecture.startsWith("https://res.cloudinary.com") &&
-            <video
-              controls
-              className="w-full h-full"
-              src={selectedVideo.videoLecture}
-              poster="" // You can add a poster image if available
-            >
-              Your browser does not support the video tag.
-            </video>
-          }
-            { selectedVideo.videoLecture.startsWith("https://odysee.com") && 
-              <iframe
-              id="odysee-iframe"
-              className="w-full aspect-video"
-              src= {selectedVideo.videoLecture}
-              allowFullScreen
-              title= {selectedVideo.sModuleTitle}
-            />
-            }
+
+          {/* Sidebar - Right on desktop, hidden on mobile (content shown below video) */}
+          <div className="hidden lg:block lg:w-1/3">
+            <div className="bg-white rounded-lg shadow-lg sticky top-8">
+              {/* Back button for desktop */}
+              <div className="p-4 border-b">
+                <button
+                  onClick={handleBackToList}
+                  className="flex items-center space-x-2 px-3 py-2 text-purple-600 hover:bg-purple-50 rounded-lg transition w-full"
+                >
+                  <FaArrowLeft />
+                  <span>Back to Course</span>
+                </button>
+              </div>
+
+              
+              {/* Course Navigation */}
+              <div className="p-4">
+                <h3 className="font-semibold text-gray-800 mb-3">Course Navigation</h3>
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {data.modules.map((module) => (
+                    <div key={module._id}>
+                      <h4 className="text-sm font-medium text-gray-700 mb-1">
+                        {module.moduleTitle}
+                      </h4>
+                      {module.subModules.map((subModule) => (
+                        <button
+                          key={subModule._id}
+                          onClick={() => handleVideoClick(subModule)}
+                          className={`w-full text-left text-xs p-2 rounded mb-1 transition ${
+                            selectedVideo._id === subModule._id
+                              ? 'bg-purple-100 text-purple-700 border-l-2 border-purple-600'
+                              : 'text-gray-600 hover:bg-gray-100'
+                          }`}
+                        >
+                          {subModule.sModuleTitle}
+                        </button>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+             
+              {/* PDF Download */}
+              {selectedVideo.attachedPdf && (
+                <div className="p-4 border-b">
+                  <h3 className="font-semibold text-gray-800 mb-3 flex items-center">
+                    <FaFileAlt className="mr-2 text-red-600" />
+                    Resources
+                  </h3>
+                  <button
+                    onClick={() => handlePdfDownload(selectedVideo.attachedPdf, selectedVideo.sModuleTitle)}
+                    className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition w-full justify-center text-sm"
+                  >
+                    <FaDownload />
+                    <span>Download PDF</span>
+                  </button>
+                </div>
+              )}
+
+               {/* Content Description */}
+              {selectedVideo.description && (
+                <div className="p-4 border-b">
+                  <h3 className="font-semibold text-gray-800 mb-3 flex items-center">
+                    <FaBookOpen className="mr-2 text-purple-600" />
+                    Description
+                  </h3>
+                  <p className="text-gray-700 text-sm leading-relaxed">
+                    {selectedVideo.description}
+                  </p>
+                </div>
+              )}
+
+
+            </div>
           </div>
         </div>
       </div>
     );
   }
 
+  // Main course accordion view
   return (
     <div className="relative flex flex-col lg:flex-row max-w-screen-xl mx-auto px-4 py-8 gap-8">
       {/* Left Section: Accordion */}
@@ -163,6 +294,15 @@ const CourseAccordion: React.FC<CourseAccordionProps> = ({ courseId }) => {
         <h1 className="text-3xl font-bold text-purple-800 mb-6">
           {data.name}
         </h1>
+        
+        {!courseIncluded && (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+            <p className="text-yellow-800 text-sm">
+              <strong>Note:</strong> You need to enroll in this course to access the video content.
+            </p>
+          </div>
+        )}
+
         <div className="bg-white border border-gray-300 rounded-lg shadow-lg divide-y divide-gray-200">
           {data.modules.map((module) => (
             <div key={module._id}>
@@ -175,16 +315,21 @@ const CourseAccordion: React.FC<CourseAccordionProps> = ({ courseId }) => {
                 } hover:bg-purple-50 transition`}
                 onClick={() => toggleModule(module.moduleNumber)}
               >
-                <div className="flex flex-col text-left">
-                  <span className="font-medium">
+                <div className="flex flex-col text-left flex-1">
+                  <span className="font-medium text-lg">
                     {module.moduleNumber}. {module.moduleTitle}
                   </span>
-                  <span className="text-sm text-gray-500">
-                    0/{module.subModules.length} · {formatDuration(module.moduleDuration)}
+                  {module.description && (
+                    <span className="text-sm text-gray-600 mt-1">
+                      {module.description}
+                    </span>
+                  )}
+                  <span className="text-sm text-gray-500 mt-1">
+                    0/{module.subModules.length} · {formatDuration(module.moduleDuration * 60)} · Reward: {module.reward} points
                   </span>
                 </div>
                 <span
-                  className={`transform transition-transform ${
+                  className={`transform transition-transform ml-4 ${
                     openModule === module.moduleNumber
                       ? "rotate-90 text-purple-600"
                       : "text-gray-500"
@@ -196,32 +341,58 @@ const CourseAccordion: React.FC<CourseAccordionProps> = ({ courseId }) => {
 
               {/* Accordion Content */}
               {openModule === module.moduleNumber && module.subModules && (
-                <div className="bg-purple-50 px-6 py-4 space-y-6">
+                <div className="bg-purple-50 px-6 py-4 space-y-4">
                   {module.subModules.map((subModule) => (
-                    <div key={subModule._id} className="space-y-4">
-                      {/* Main Lecture Section */}
+                    <div key={subModule._id} className="bg-white rounded-lg shadow-sm overflow-hidden">
+                      {/* Video Lecture Section */}
                       <div
-                        className="flex justify-between items-center bg-purple-600 px-4 py-3 rounded-lg shadow-md text-white cursor-pointer hover:bg-purple-700 transition"
-                        onClick={() => handleVideoClick(subModule)}
+                        className={`flex justify-between items-center px-4 py-3 ${
+                          courseIncluded 
+                            ? "bg-purple-600 text-white cursor-pointer hover:bg-purple-700" 
+                            : "bg-gray-400 text-gray-200 cursor-not-allowed"
+                        } transition`}
+                        onClick={() => courseIncluded && handleVideoClick(subModule)}
                       >
-                        <div className="flex items-center space-x-2">
-                          <FaPlay />
-                          <span>{subModule.sModuleTitle}</span>
+                        <div className="flex items-center space-x-3">
+                          <FaPlay className={courseIncluded ? "text-white" : "text-gray-300"} />
+                          <span className="font-medium">{subModule.sModuleTitle}</span>
                         </div>
-                        <span>{formatDuration(subModule.sModuleDuration)}</span>
+                        <span className="text-sm">
+                          {formatDuration(subModule.sModuleDuration)}
+                        </span>
                       </div>
 
-                      {/* Assignment Section (if needed) */}
-                      <div
-                        className="flex justify-between items-center px-4 py-2 bg-white rounded-lg shadow-md cursor-pointer hover:bg-purple-100 transition"
-                        onClick={() => handleVideoClick(subModule)}
-                      >
-                        <span className="text-gray-800 font-medium">
-                          {module.moduleNumber}.{subModule.sModuleNumber}. Module Content
-                        </span>
-                        <span className="text-gray-500 text-sm">
-                          Reward: {module.reward} point{module.reward !== 1 ? 's' : ''}
-                        </span>
+                      {/* Description and Resources */}
+                      <div className="p-4 space-y-3">
+                        {subModule.description && (
+                          <div>
+                            <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center">
+                              <FaBookOpen className="mr-2 text-purple-600" />
+                              Description
+                            </h4>
+                            <p className="text-gray-600 text-sm leading-relaxed">
+                              {subModule.description}
+                            </p>
+                          </div>
+                        )}
+
+                        {subModule.attachedPdf && (
+                          <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                            <div className="flex items-center space-x-2">
+                              <FaFileAlt className="text-red-600" />
+                              <span className="text-sm font-medium text-gray-700">
+                                PDF Resource Available
+                              </span>
+                            </div>
+                            <button
+                              onClick={() => handlePdfDownload(subModule.attachedPdf, subModule.sModuleTitle)}
+                              className="flex items-center space-x-1 px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition"
+                            >
+                              <FaDownload className="text-xs" />
+                              <span>Download</span>
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -229,6 +400,46 @@ const CourseAccordion: React.FC<CourseAccordionProps> = ({ courseId }) => {
               )}
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Right Section: Course Info (visible only when not playing video) */}
+      <div className="lg:w-1/3">
+        <div className="bg-white rounded-lg shadow-lg p-6 sticky top-8">
+          <h3 className="text-xl font-bold text-gray-800 mb-4">Course Overview</h3>
+          
+          <div className="space-y-4">
+            <div>
+              <span className="text-sm font-medium text-gray-600">Total Modules:</span>
+              <span className="ml-2 text-gray-800">{data.modules.length}</span>
+            </div>
+            
+            <div>
+              <span className="text-sm font-medium text-gray-600">Total Lessons:</span>
+              <span className="ml-2 text-gray-800">
+                {data.modules.reduce((total, module) => total + module.subModules.length, 0)}
+              </span>
+            </div>
+
+            <div>
+              <span className="text-sm font-medium text-gray-600">Status:</span>
+              <span className={`ml-2 px-2 py-1 rounded-full text-xs ${
+                courseIncluded 
+                  ? 'bg-green-100 text-green-800' 
+                  : 'bg-yellow-100 text-yellow-800'
+              }`}>
+                {courseIncluded ? 'Enrolled' : 'Not Enrolled'}
+              </span>
+            </div>
+          </div>
+
+          {!courseIncluded && (
+            <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+              <p className="text-blue-800 text-sm">
+                Enroll in this course to access all video lectures and downloadable resources.
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
