@@ -270,7 +270,7 @@ export default function MyCoursesPage() {
               <Users className="h-12 w-12 text-gray-400" />
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">No courses found</h3>
-            <p className="text-gray-500 mb-6">You haven't created any courses yet.</p>
+            <p className="text-gray-500 mb-6">You haven&apos;t created any courses yet.</p>
             <button className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
               Create Your First Course
             </button>
@@ -403,7 +403,7 @@ export default function MyCoursesPage() {
             </div>
             
             <p className="text-gray-600 mb-6">
-              Are you sure you want to delete "<strong>{courseToDelete.name}</strong>"? 
+              Are you sure you want to delete &quot;<strong>{courseToDelete.name}</strong>&quot;? 
               This action cannot be undone and will affect {courseToDelete.studentsEnrolled} enrolled students.
             </p>
             

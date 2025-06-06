@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { useState } from "react";
-import Link from "next/link";
+// import Link from "next/link";
 import { ICourse } from "@/app/models/Course";
 import formatDuration from "@/lib/formatDuration";
 import { FaPlay, FaVideo, FaFileAlt, FaBookOpen } from "react-icons/fa";
