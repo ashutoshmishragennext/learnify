@@ -34,18 +34,13 @@ export async function POST(req: Request) {
       const reward = Number(module.reward) || 0;
 
       // Module duration in seconds
-      const moduleDurationInSeconds =
-        (Number(module.duration?.hours || 0) * 3600) +
-        (Number(module.duration?.minutes || 0) * 60) +
-        (Number(module.duration?.seconds || 0));
+      const moduleDurationInSeconds = Number(((module.duration)/60/60).toFixed(3));
 
       rewardsArray.push(reward);
-      totalDuration += moduleDurationInSeconds;
+      totalDuration += Number(moduleDurationInSeconds.toFixed(3));
 
       const subModules = (module.subModules || []).map((sub: any) => {
-        const subDurationInSeconds =
-          (Number(sub.duration?.minutes || 0) * 60) +
-          (Number(sub.duration?.seconds || 0));
+        const subDurationInSeconds = (Number(sub.duration || 0));
 
         return {
           sModuleNumber: Number(sub.partNumber) || 0,
@@ -61,7 +56,7 @@ export async function POST(req: Request) {
       return {
         moduleNumber: index + 1,
         moduleTitle: module.topic || '',
-        moduleDuration: moduleDurationInSeconds,
+        moduleDuration: Number(moduleDurationInSeconds.toFixed(3).substring(0,5)),
         subModulePart: Number(module.parts) || subModules.length,
         reward: reward,
         description: module.description || '',

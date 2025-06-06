@@ -344,7 +344,7 @@ const uploadPdfToCloudinary = async (file: File) => {
 
     const data = await res.json();
     toast.success("PDF uploaded successfully");
-    return data.secure_url;
+    return data.url;
   } catch (error) {
     console.error("Cloudinary PDF Upload Error:", error);
     toast.error("Failed to upload PDF");
@@ -379,7 +379,7 @@ const handleModuleInputChange = (
 
         const updatedModule: ModuleField = {
           ...module,
-          [field]: field === "topic" || field === "description" 
+          [field]: field === "topic" || field === "description" || "attachedPdf" 
             ? value.toString() 
             : Number(value),
         };
@@ -411,7 +411,7 @@ const handleModuleInputChange = (
                   ? {
                       ...sub,
                       [field]:
-                        field === "partName" || field === "description"
+                        field === "partName" || field === "description" || field === "attachedPdf"
                           ? (value ?? "").toString()
                           : field === "videoLecture"
                           ? value ?? ""
