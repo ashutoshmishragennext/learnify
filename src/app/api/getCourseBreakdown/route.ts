@@ -6,10 +6,8 @@ import Course from '@/app/models/Course';
 
 export async function GET(req: NextRequest) {
   try {
-    // Connect to database
     await connectDB();
 
-    // Get courseId from query parameters
     const { searchParams } = new URL(req.url);
     const courseId = searchParams.get('courseId');
 
@@ -20,7 +18,6 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Find the course by courseId
     const course = await Course.findOne({ courseId });
 
     if (!course) {
@@ -30,40 +27,42 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    // Transform modules to match the required response format
+    // Helper to convert hours to { hours, minutes, seconds }
+    const convertDuration = (durationInHours: number) => {
+      const durationInSeconds = durationInHours * 3600;
+      const hours = Math.floor(durationInSeconds / 3600);
+      const minutes = Math.floor((durationInSeconds % 3600) / 60);
+      const seconds = durationInSeconds % 60;
+      return { hours, minutes, seconds };
+    };
+
+    // Helper to convert seconds to { minutes, seconds }
+    const convertSubModuleDuration = (durationInSeconds: number) => {
+      const minutes = Math.floor(durationInSeconds / 60);
+      const seconds = durationInSeconds % 60;
+      return { minutes, seconds };
+    };
+
+    // 🔄 Transform modules
     const courseBreakdown = course.modules.map((module: any) => {
-      // Helper function to convert duration from seconds to hours, minutes, seconds
-      const convertDuration = (durationInHours: number) => {
-        const durationInSeconds = durationInHours * 3600;
-        const hours = Math.floor(durationInSeconds / 3600);
-        const minutes = Math.floor((durationInSeconds % 3600) / 60);
-        const seconds = durationInSeconds % 60;
-        return { hours, minutes, seconds };
-      };
-
-      // Helper function to convert submodule duration (assuming it's in seconds)
-      const convertSubModuleDuration = (durationInSeconds: number) => {
-        const minutes = Math.floor(durationInSeconds / 60);
-        const seconds = durationInSeconds % 60;
-        return { minutes, seconds };
-      };
-
-      // Transform submodules
-      const subModules = Array.isArray(module.subModules) 
+      const subModules = Array.isArray(module.subModules)
         ? module.subModules.map((subModule: any) => ({
             partNumber: subModule.sModuleNumber || 1,
-            partName: subModule.sModuleTitle || "",
+            partName: subModule.sModuleTitle || '',
             duration: convertSubModuleDuration(subModule.sModuleDuration || 0),
             videoLecture: subModule.videoLecture || null,
+            description: subModule.description || '',
+            attachedPdf: subModule.attachedPdf || '',
           }))
-        : []; // Handle case where subModules might be a single object or undefined
+        : [];
 
       return {
         number: module.moduleNumber || 1,
-        topic: module.moduleTitle || "",
+        topic: module.moduleTitle || '',
         parts: module.subModulePart || subModules.length || 1,
         duration: convertDuration(module.moduleDuration || 0),
         reward: module.reward || 0,
+        description: module.description || '',
         subModules,
       };
     });

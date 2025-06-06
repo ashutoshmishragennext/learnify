@@ -7,14 +7,13 @@ import { auth } from "../../../../auth";
 
 export async function POST(req: Request) {
   const session = await auth();
-  
+
   try {
     await connectDB();
 
     const data = await req.json();
     const courseId = data.courseId;
 
-    // Validate required data
     if (!courseId) {
       return NextResponse.json({ error: "Course ID is required" }, { status: 400 });
     }
@@ -23,8 +22,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Modules data is required and must be an array" }, { status: 400 });
     }
 
-    // Check if course exists
-    const existingCourse = await Course.findOne({ courseId: courseId });
+    const existingCourse = await Course.findOne({ courseId });
     if (!existingCourse) {
       return NextResponse.json({ error: "Course not found" }, { status: 404 });
     }
@@ -32,38 +30,49 @@ export async function POST(req: Request) {
     const rewardsArray: number[] = [];
     let totalDuration = 0;
 
-    // Transform modules data to match schema
     const modules = data.modules.map((module: any, index: number) => {
       const reward = Number(module.reward) || 0;
-      const moduleDuration = Number((module.duration/60/60).toFixed(3)) || 0;
-      
-      rewardsArray.push(reward);
-      totalDuration += moduleDuration;
 
-      // Transform sub-modules
-      const subModules = (module.subModules || []).map((sub: any) => ({
-        sModuleNumber: Number(sub.partNumber) || 0,
-        sModuleTitle: sub.partName || '',
-        sModuleDuration: Number((sub.duration)) || 0,
-        videoLecture: sub.videoLecture || '',
-      }));
+      // Module duration in seconds
+      const moduleDurationInSeconds =
+        (Number(module.duration?.hours || 0) * 3600) +
+        (Number(module.duration?.minutes || 0) * 60) +
+        (Number(module.duration?.seconds || 0));
+
+      rewardsArray.push(reward);
+      totalDuration += moduleDurationInSeconds;
+
+      const subModules = (module.subModules || []).map((sub: any) => {
+        const subDurationInSeconds =
+          (Number(sub.duration?.minutes || 0) * 60) +
+          (Number(sub.duration?.seconds || 0));
+
+        return {
+          sModuleNumber: Number(sub.partNumber) || 0,
+          sModuleTitle: sub.partName || '',
+          sModuleDuration: subDurationInSeconds,
+          videoLecture: sub.videoLecture || null,
+          videoType: sub.videoType || 'file',
+          description: sub.description || '',
+          attachedPdf: sub.attachedPdf || '',
+        };
+      });
 
       return {
-        moduleNumber: index + 1, // Ensure sequential numbering
+        moduleNumber: index + 1,
         moduleTitle: module.topic || '',
-        moduleDuration: moduleDuration,
+        moduleDuration: moduleDurationInSeconds,
         subModulePart: Number(module.parts) || subModules.length,
         reward: reward,
+        description: module.description || '',
         subModules: subModules,
       };
     });
 
-    // Calculate total rewards
     const totalReward = rewardsArray.reduce((acc, curr) => acc + curr, 0);
 
-    // Update the course with modules and calculated values
     const updatedCourse = await Course.findOneAndUpdate(
-      { courseId: courseId },
+      { courseId },
       {
         $set: {
           modules: modules,
@@ -83,7 +92,7 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json(
-      { 
+      {
         message: "Course modules updated successfully",
         course: {
           courseId: updatedCourse.courseId,

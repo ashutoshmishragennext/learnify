@@ -25,16 +25,19 @@ import {
   FileVideo,
   Trash2,
   Link,
-  Upload
+  Upload,
+  FileText
 } from "lucide-react";
 
-// Define types for module fields and internal details
+
 interface InternalDetail {
   partNumber: number;
   partName: string;
   duration: { minutes: number; seconds: number };
-  videoLecture: File | string | null; // Updated to accept both File and string (URL)
-  videoType: 'file' | 'url'; // New field to track video type
+  videoLecture: File | string | null;
+  videoType: 'file' | 'url';
+  description: string; // Add this
+  attachedPdf: string; // Add this
 }
 
 interface ModuleField {
@@ -43,6 +46,7 @@ interface ModuleField {
   parts: number;
   duration: { hours: number; minutes: number; seconds: number };
   reward: number;
+  description: string; // Add this
   subModules: InternalDetail[];
 }
 
@@ -113,24 +117,26 @@ const Breakdown: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   
   const [moduleFields, setModuleFields] = useState<ModuleField[]>([
-    {
-      number: 1,
-      topic: "",
-      parts: 1,
-      duration: { hours: 0, minutes: 0, seconds: 0 },
-      reward: 1,
-      subModules: [
-        {
-          partNumber: 1,
-          partName: "",
-          duration: { minutes: 0, seconds: 0 },
-          videoLecture: null,
-          videoType: 'url', // Default to URL
-        },
-      ],
-    },
-  ]);
-
+  {
+    number: 1,
+    topic: "",
+    parts: 1,
+    duration: { hours: 0, minutes: 0, seconds: 0 },
+    reward: 1,
+    description: "", // Add this
+    subModules: [
+      {
+        partNumber: 1,
+        partName: "",
+        duration: { minutes: 0, seconds: 0 },
+        videoLecture: null,
+        videoType: 'url',
+        description: "", // Add this
+        attachedPdf: "", // Add this
+      },
+    ],
+  },
+]);
   // Fetch user's courses
   const fetchUserCourses = async () => {
     try {
@@ -158,44 +164,53 @@ const Breakdown: React.FC = () => {
         if (data && data.length > 0) {
           // Convert the fetched data to match our component structure
           const convertedData = data.map((module: any) => ({
-            ...module,
-            subModules: module.subModules.map((sub: any) => ({
-              ...sub,
-              videoType: typeof sub.videoLecture === 'string' && sub.videoLecture?.startsWith('http') ? 'url' : 'file',
-              duration: {
-  minutes: sub.duration?.minutes || 0,
-  seconds: sub.duration?.seconds || 0
-}
-            })),
-            duration: {
-  hours: module.duration?.hours || 0,
-  minutes: module.duration?.minutes || 0,
-  seconds: module.duration?.seconds || 0
-}
-          }));
+  ...module,
+  description: module.description || "", // Add this
+  subModules: module.subModules.map((sub: any) => ({
+    ...sub,
+    videoType: typeof sub.videoLecture === 'string' && sub.videoLecture?.startsWith('http') ? 'url' : 'file',
+    description: sub.description || "", // Add this
+    attachedPdf: sub.attachedPdf || "", // Add this
+    duration: {
+      minutes: sub.duration?.minutes || 0,
+      seconds: sub.duration?.seconds || 0
+    }
+  })),
+  duration: {
+    hours: module.duration?.hours || 0,
+    minutes: module.duration?.minutes || 0,
+    seconds: module.duration?.seconds || 0
+  }
+}));
+
+
           setModuleFields(convertedData);
           toast.success("Course breakdown loaded successfully!");
         }
         else {
   // No existing data found, set default
   setModuleFields([
-    {
-      number: 1,
-      topic: "",
-      parts: 1,
-      duration: { hours: 0, minutes: 0, seconds: 0 },
-      reward: 1,
-      subModules: [
-        {
-          partNumber: 1,
-          partName: "",
-          duration: { minutes: 0, seconds: 0 },
-          videoLecture: null,
-          videoType: 'url',
-        },
-      ],
-    },
-  ]);
+  {
+    number: 1,
+    topic: "",
+    parts: 1,
+    duration: { hours: 0, minutes: 0, seconds: 0 },
+    reward: 1,
+    description: "", // Add this
+    subModules: [
+      {
+        partNumber: 1,
+        partName: "",
+        duration: { minutes: 0, seconds: 0 },
+        videoLecture: null,
+        videoType: 'url',
+        description: "", // Add this
+        attachedPdf: "", // Add this
+      },
+    ],
+  },
+]);
+
 }
       }
     } catch (error) {
@@ -217,47 +232,53 @@ const Breakdown: React.FC = () => {
   } else {
     // Only reset if no courseId
     setModuleFields([
+  {
+    number: 1,
+    topic: "",
+    parts: 1,
+    duration: { hours: 0, minutes: 0, seconds: 0 },
+    reward: 1,
+    description: "", // Add this
+    subModules: [
       {
-        number: 1,
-        topic: "",
-        parts: 1,
-        duration: { hours: 0, minutes: 0, seconds: 0 },
-        reward: 1,
-        subModules: [
-          {
-            partNumber: 1,
-            partName: "",
-            duration: { minutes: 0, seconds: 0 },
-            videoLecture: null,
-            videoType: 'url',
-          },
-        ],
+        partNumber: 1,
+        partName: "",
+        duration: { minutes: 0, seconds: 0 },
+        videoLecture: null,
+        videoType: 'url',
+        description: "", // Add this
+        attachedPdf: "", // Add this
       },
-    ]);
+    ],
+  },
+]);
   }
 };
 
   const addModuleField = () => {
-    setModuleFields([
-      ...moduleFields,
-      {
-        number: moduleFields.length + 1,
-        topic: "",
-        parts: 1,
-        duration: { hours: 0, minutes: 0, seconds: 0 },
-        reward: 1,
-        subModules: [
-          {
-            partNumber: 1,
-            partName: "",
-            duration: { minutes: 0, seconds: 0 },
-            videoLecture: null,
-            videoType: 'url',
-          },
-        ],
-      },
-    ]);
-  };
+  setModuleFields([
+    ...moduleFields,
+    {
+      number: moduleFields.length + 1,
+      topic: "",
+      parts: 1,
+      duration: { hours: 0, minutes: 0, seconds: 0 },
+      reward: 1,
+      description: "", // Add this
+      subModules: [
+        {
+          partNumber: 1,
+          partName: "",
+          duration: { minutes: 0, seconds: 0 },
+          videoLecture: null,
+          videoType: 'url',
+          description: "", // Add this
+          attachedPdf: "", // Add this
+        },
+      ],
+    },
+  ]);
+};
 
   const deleteModule = (index: number) => {
     if (moduleFields.length === 1) {
@@ -280,31 +301,74 @@ const Breakdown: React.FC = () => {
     );
   };
 
-  const addInternalDetailRow = (moduleIndex: number) => {
-    setModuleFields((prevFields) =>
-      prevFields.map((module, i) =>
-        i === moduleIndex
-          ? module.subModules.length < module.parts
-            ? {
-                ...module,
-                subModules: [
-                  ...module.subModules,
-                  {
-                    partNumber: module.subModules.length + 1,
-                    partName: "",
-                    duration: { minutes: 0, seconds: 0 },
-                    videoLecture: null,
-                    videoType: 'url',
-                  },
-                ],
-              }
-            : module
+const addInternalDetailRow = (moduleIndex: number) => {
+  setModuleFields((prevFields) =>
+    prevFields.map((module, i) =>
+      i === moduleIndex
+        ? module.subModules.length < module.parts
+          ? {
+              ...module,
+              subModules: [
+                ...module.subModules,
+                {
+                  partNumber: module.subModules.length + 1,
+                  partName: "",
+                  duration: { minutes: 0, seconds: 0 },
+                  videoLecture: null,
+                  videoType: 'url',
+                  description: "", // Add this
+                  attachedPdf: "", // Add this
+                },
+              ],
+            }
           : module
-      )
-    );
-  };
+        : module
+    )
+  );
+};
 
-  const handleModuleInputChange = (
+const uploadPdfToCloudinary = async (file: File) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", "learnify_frontend");
+  formData.append("cloud_name", "dtfe8o5ny");
+
+  try {
+    const res = await fetch(
+      `https://api.cloudinary.com/v1_1/dtfe8o5ny/raw/upload`, // Note: using 'raw' for PDFs
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    const data = await res.json();
+    toast.success("PDF uploaded successfully");
+    return data.secure_url;
+  } catch (error) {
+    console.error("Cloudinary PDF Upload Error:", error);
+    toast.error("Failed to upload PDF");
+    return null;
+  }
+};
+
+const removePdf = (moduleIndex: number, subIndex: number) => {
+  handleInternalDetailChange(moduleIndex, subIndex, "attachedPdf", "");
+};
+
+
+const handlePdfUpload = async (
+  moduleIndex: number,
+  subIndex: number,
+  file: File
+) => {
+  const uploadedUrl = await uploadPdfToCloudinary(file);
+  if (uploadedUrl) {
+    handleInternalDetailChange(moduleIndex, subIndex, "attachedPdf", uploadedUrl);
+  }
+};
+
+const handleModuleInputChange = (
     index: number,
     field: keyof ModuleField,
     value: string | number
@@ -315,7 +379,9 @@ const Breakdown: React.FC = () => {
 
         const updatedModule: ModuleField = {
           ...module,
-          [field]: field === "topic" ? value.toString() : Number(value),
+          [field]: field === "topic" || field === "description" 
+            ? value.toString() 
+            : Number(value),
         };
 
         if (field === "parts") {
@@ -329,7 +395,6 @@ const Breakdown: React.FC = () => {
       })
     );
   };
-
   const handleInternalDetailChange = (
     moduleIndex: number,
     subIndex: number,
@@ -346,7 +411,7 @@ const Breakdown: React.FC = () => {
                   ? {
                       ...sub,
                       [field]:
-                        field === "partName"
+                        field === "partName" || field === "description"
                           ? (value ?? "").toString()
                           : field === "videoLecture"
                           ? value ?? ""
@@ -394,8 +459,8 @@ const Breakdown: React.FC = () => {
 
     // Validate required fields
     const hasEmptyFields = moduleFields.some(module => 
-      !module.topic || 
-      module.subModules.some(sub => !sub.partName || !sub.videoLecture)
+  !module.topic || 
+  module.subModules.some(sub => !sub.partName || !sub.videoLecture)
     );
 
     if (hasEmptyFields) {
@@ -702,6 +767,18 @@ const Breakdown: React.FC = () => {
                     />
                   </div>
 
+                  <div className="space-y-3">
+                    <Label className="font-semibold">
+                      Module Description
+                    </Label>
+                    <textarea
+                      value={field.description}
+                      onChange={(e) => handleModuleInputChange(moduleIndex, "description", e.target.value)}
+                      placeholder="Enter module description (optional)"
+                      className="w-full p-3 border border-gray-300 rounded-md resize-none h-24"
+                    />
+                  </div>
+
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="space-y-3">
                       <Label className="font-semibold">
@@ -783,8 +860,19 @@ const Breakdown: React.FC = () => {
                                 <Input
                                   value={row.partName}
                                   onChange={(e) => handleInternalDetailChange(moduleIndex, subIndex, "partName", e.target.value)}
-                                  placeholder="Enter part name"
+                                  placeholder="i.e ; Intro to next js"
                                   className="h-10"
+                                />
+                              </div>
+                              <div className="space-y-2">
+                                <Label className="font-semibold">
+                                  Part Description
+                                </Label>
+                                <textarea
+                                  value={row.description}
+                                  onChange={(e) => handleInternalDetailChange(moduleIndex, subIndex, "description", e.target.value)}
+                                  placeholder="Enter part description (optional)"
+                                  className="w-full p-3 border border-gray-300 rounded-md resize-none h-20"
                                 />
                               </div>
                             </div>
@@ -884,6 +972,48 @@ const Breakdown: React.FC = () => {
                                 
                                 {getVideoStatus(row)}
                               </div>
+
+                              <div className="space-y-2">
+  <Label className="font-semibold flex items-center gap-2">
+    <FileText className="w-4 h-4" />
+    Attach PDF (Optional)
+  </Label>
+  <div className="flex items-center gap-2">
+    <Input
+      type="file"
+      accept=".pdf"
+      onChange={(e) => e.target.files && handlePdfUpload(moduleIndex, subIndex, e.target.files[0])}
+      className="h-10"
+    />
+    {row.attachedPdf && (
+      <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 text-sm text-green-600">
+          <CheckCircle2 className="w-4 h-4" />
+          PDF attached
+        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => removePdf(moduleIndex, subIndex)}
+          className="text-red-500 hover:text-red-700"
+        >
+          <Trash2 className="w-4 h-4" />
+        </Button>
+      </div>
+    )}
+  </div>
+  {row.attachedPdf && (
+    <a 
+      href={row.attachedPdf} 
+      target="_blank" 
+      rel="noopener noreferrer"
+      className="text-blue-600 hover:underline text-sm"
+    >
+      View attached PDF
+    </a>
+  )}
+</div>
+
                             </div>
 
                             <div className="flex justify-end">

@@ -21,11 +21,30 @@ interface IPrice {
   discountPercentage: number;
 }
 
+// interface ISubmodule {
+//   sModuleNumber: number;
+//   sModuleTitle: string;
+//   sModuleDuration: number;
+//   videoLecture: string;
+// }
+
+// interface IModule {
+//   moduleNumber: number;
+//   moduleTitle: string;
+//   moduleDuration: number;
+//   subModulePart: number;
+//   reward: number;
+//   subModules: ISubmodule;
+// }
+
 interface ISubmodule {
   sModuleNumber: number;
   sModuleTitle: string;
   sModuleDuration: number;
-  videoLecture: string;
+  videoLecture: string | null;
+  videoType ?: string;
+  description?: string;
+  attachedPdf?: string;
 }
 
 interface IModule {
@@ -34,8 +53,10 @@ interface IModule {
   moduleDuration: number;
   subModulePart: number;
   reward: number;
-  subModules: ISubmodule;
+  description?: string;
+  subModules: ISubmodule[];
 }
+
 
 interface IRating {
   average: number;
@@ -120,20 +141,40 @@ const PriceSchema: Schema = new Schema({
   discountPercentage: { type: Number, default: 0 },
 });
 
+// const SubmoduleSchema: Schema = new Schema({
+//   sModuleNumber: Number,
+//   sModuleTitle: String,
+//   sModuleDuration: Number,
+//   videoLecture: String,
+// })
+
 const SubmoduleSchema: Schema = new Schema({
   sModuleNumber: Number,
   sModuleTitle: String,
   sModuleDuration: Number,
-  videoLecture: String,
-})
+  videoLecture: { type: String, default: null },
+  videoType : {type:String , required: false },
+  description: { type: String, required: false },
+  attachedPdf: { type: String, required: false },
+});
+
+// const ModuleSchema: Schema = new Schema({
+//   moduleNumber: { type: Number,  },
+//   moduleTitle: { type: String, },
+//   moduleDuration: { type: Number,  },
+//   subModulePart: {type: Number},
+//   reward: { type: Number, },
+//   subModules: [SubmoduleSchema]
+// });
 
 const ModuleSchema: Schema = new Schema({
-  moduleNumber: { type: Number,  },
-  moduleTitle: { type: String, },
-  moduleDuration: { type: Number,  },
-  subModulePart: {type: Number},
-  reward: { type: Number, },
-  subModules: [SubmoduleSchema]
+  moduleNumber: { type: Number },
+  moduleTitle: { type: String },
+  moduleDuration: { type: Number },
+  subModulePart: { type: Number },
+  reward: { type: Number },
+  description: { type: String, required: false },
+  subModules: [SubmoduleSchema],
 });
 
 const RatingSchema: Schema = new Schema({
