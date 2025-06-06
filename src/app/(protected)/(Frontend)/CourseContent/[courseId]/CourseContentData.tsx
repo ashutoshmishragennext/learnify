@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { ICourse } from "@/app/models/Course";
 import formatDuration from "@/lib/formatDuration";
-import { FaPlay, FaVideo } from "react-icons/fa";
+import { FaPlay, FaVideo, FaFileAlt, FaBookOpen } from "react-icons/fa";
 
 interface CoursePageProps {
   course: ICourse;
@@ -134,46 +134,104 @@ const CourseContentData: React.FC<CoursePageProps> = ({ course }) => {
         Our courses are a balanced mix of videos & assignments
       </h1>
       <div className="flex items-center space-x-2 text-sm text-gray-500 mb-4">
-        <Link href="#">{countLessons} Lessons</Link>
-        <Link href="#">• {course.totalVideoLectures} Videos</Link>
-        <Link href="#">• {course.totalAssignments} Assignments</Link>
+        <span>{countLessons} Lessons</span>
+        <span>• {course.totalVideoLectures} Videos</span>
+        <span>• {course.totalAssignments} Assignments</span>
       </div>
+
       <div className="space-y-4">
         {course.modules.map((module, moduleNumber) => (
-          <div key={moduleNumber} className="bg-white p-4 rounded shadow">
+          <div key={moduleNumber} className="bg-white rounded-lg shadow-md overflow-hidden">
             <div
-              className="flex justify-between items-center cursor-pointer"
+              className="flex justify-between items-center cursor-pointer p-4 hover:bg-gray-50 transition-colors"
               onClick={() => toggleSection(moduleNumber)}
             >
-              <h3 className="font-semibold flex items-center space-x-2">
-                <span>{expandedSections.includes(moduleNumber) ? "–" : "+"}</span>
-                <span>{module.moduleTitle}</span>
-              </h3>
-              <span className="text-gray-500">
-                {module.subModulePart} Sections, {formatDuration(module.moduleDuration)}
-              </span>
+              <div className="flex-1">
+                <h3 className="font-semibold flex items-center space-x-3">
+                  <span className="text-lg">{expandedSections.includes(moduleNumber) ? "−" : "+"}</span>
+                  <span className="text-lg">{module.moduleTitle}</span>
+                </h3>
+                {/* Module Description */}
+                {module.description && (
+                  <p className="text-gray-600 text-sm mt-2 ml-8">{module.description}</p>
+                )}
+              </div>
+              <div className="text-right">
+                <span className="text-gray-500 text-sm">
+                  {module.subModulePart} Sections
+                </span>
+                {module.moduleDuration > 0 && (
+                  <div className="text-gray-500 text-sm">
+                    {module.moduleDuration}h duration
+                  </div>
+                )}
+              </div>
             </div>
+
             {expandedSections.includes(moduleNumber) && (
-              <div className="mt-4 space-y-2">
+              <div className="border-t bg-gray-50">
                 {module.subModules && Array.isArray(module.subModules) && module.subModules.length > 0 ? (
-                  module.subModules.map((submodule, sModuleNumber) => (
-                    <div
-                      key={sModuleNumber}
-                      className="flex justify-between items-center border-t pt-2"
-                    >
-                      <p className="flex items-center space-x-2">
-                        <span className="text-blue-500">•</span>
-                        <span>{submodule.sModuleTitle}</span>
-                      </p>
-                      <div className="flex items-center space-x-2">
-                        <span className="text-gray-500">
-                          {formatDuration(submodule.sModuleDuration, true)}
-                        </span>
+                  <div className="p-4 space-y-3">
+                    {module.subModules.map((submodule, sModuleNumber) => (
+                      <div
+                        key={sModuleNumber}
+                        className="bg-white rounded-lg p-4 border border-gray-200 hover:border-purple-300 transition-colors"
+                      >
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-3">
+                              <span className="text-purple-500 font-bold">
+                                {sModuleNumber + 1}.
+                              </span>
+                              <h4 className="font-semibold text-gray-800">
+                                {submodule.sModuleTitle}
+                              </h4>
+                            </div>
+                            
+                            {/* Submodule Description */}
+                            {submodule.description && (
+                              <div className="mt-2 ml-6">
+                                <div className="flex items-center space-x-2 mb-1">
+                                  <FaBookOpen className="text-purple-500 text-sm" />
+                                  <span className="text-sm font-medium text-gray-700">Description:</span>
+                                </div>
+                                <p className="text-gray-600 text-sm ml-6">{submodule.description}</p>
+                              </div>
+                            )}
+
+                            {/* Additional Resources */}
+                            <div className="mt-3 ml-6 flex flex-wrap gap-4">
+                              {submodule.videoLecture && (
+                                <div className="flex items-center space-x-2 text-sm text-gray-600">
+                                  <FaVideo className="text-blue-500" />
+                                  <span>Video Lecture Available</span>
+                                </div>
+                              )}
+                              {submodule.attachedPdf && (
+                                <div className="flex items-center space-x-2 text-sm text-gray-600">
+                                  <FaFileAlt className="text-red-500" />
+                                  <span>PDF Resource Available</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="text-right ml-4">
+                            {submodule.sModuleDuration > 0 && (
+                              <span className="text-gray-500 text-sm">
+                                {formatDuration(submodule.sModuleDuration, true)}
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  ))
+                    ))}
+                  </div>
                 ) : (
-                  <p className="text-gray-500">No lessons available.</p>
+                  <div className="p-4 text-center text-gray-500">
+                    <FaBookOpen className="mx-auto text-2xl mb-2 opacity-50" />
+                    <p>No lessons available for this module yet.</p>
+                  </div>
                 )}
               </div>
             )}

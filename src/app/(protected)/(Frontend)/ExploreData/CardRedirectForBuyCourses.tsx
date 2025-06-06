@@ -18,7 +18,7 @@ interface CardProps {
   students: number | any;
   price: number;
   originalPrice: number;
-  description:  any;
+  description:  string | undefined;
   buttonLabel: string;
   dateRange?: string;
   courseId: string;
@@ -136,7 +136,7 @@ const CardRedirectForBuyCourses: React.FC<CardProps> = ({
           {title}
         </h3>
 
-        <p className="text-left mb-4 text-[#4D4D4D]">{description}</p>
+        <p className="text-left mb-4 text-[#4D4D4D] h-28">{description?.substring(0,160)}</p>
 
         <div className="flex justify-between items-center mt-auto">
           <div>

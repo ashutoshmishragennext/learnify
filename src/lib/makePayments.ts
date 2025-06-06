@@ -160,7 +160,7 @@ const makePayments = async (
             toast.error(`Error removing course: ${removeData.error}`);
             return resolve(false);
           }
-          toast.success("Payment Successful!", { autoClose: 5000 });
+          // toast.success("Payment Successful!", { autoClose: 5000 });
           resolve(true);
         }
         toast.success("Payment Successful!", { autoClose: 5000 });
