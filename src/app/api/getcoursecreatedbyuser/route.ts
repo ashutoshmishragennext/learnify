@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server';
-import connectDB from '@/lib/dbConnect';
+// import connectDB from '@/lib/dbConnect';
 import Course from '@/app/models/Course';
-import User from '@/app/models/User';
+// import User from '@/app/models/User';
 import { auth } from '../../../../auth';
 
 export async function GET(req: NextRequest) {
