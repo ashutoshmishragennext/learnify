@@ -199,172 +199,120 @@ const CourseContentPage: React.FC = () => {
     }
   };
   return (
-    <>
-      <div className="bg-dark-blue text-white">
-        <header className="text-center py-8 flex">
-          <div className="max-w-4xl mx-auto">
-            <p className="text-sm text-gray-300">
-              Courses &gt; {course.category} &gt; {course.name}
+     <>
+
+    <div className="bg-dark-blue text-white">
+      {/* Header */}
+      <header className="py-8 px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <p className="text-sm text-gray-300">
+            Courses &gt; {course.category} &gt; {course.name}
+          </p>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mt-2">
+            {course.name}
+          </h1>
+          <p className="text-base sm:text-lg text-gray-400 mt-3">
+            {course.shortDescription}
+          </p>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mt-6">
+            {!courseIncluded && !cartIncluded && (
+              <button
+                className="border border-gray-400 rounded-md px-4 py-2 hover:bg-gray-800"
+                onClick={addToCart}
+              >
+                {isAdding ? "Adding..." : (
+                  <span className="flex items-center gap-2">
+                    <AiOutlineShoppingCart /> Cart
+                  </span>
+                )}
+              </button>
+            )}
+            {!courseIncluded && cartIncluded && (
+              <button className="bg-green-500 text-white px-4 py-2 rounded-md" disabled>
+                Added to Cart
+              </button>
+            )}
+            {!courseIncluded && !wishlistIncluded && (
+              <button
+                className="border border-gray-400 rounded-md px-4 py-2 hover:bg-gray-800"
+                onClick={addToWishlist}
+              >
+                {isWishing ? "Adding..." : (
+                  <span className="flex items-center gap-2">
+                    <AiOutlineHeart /> Wishlist
+                  </span>
+                )}
+              </button>
+            )}
+            {!courseIncluded && wishlistIncluded && (
+              <button className="bg-green-500 text-white px-4 py-2 rounded-md" disabled>
+                Wishlisted
+              </button>
+            )}
+            {!courseIncluded ? (
+              <button
+                className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-md"
+                onClick={handlePayment}
+              >
+                {isProcessing ? "Processing..." : `Buy Now (₹ ${course.price.current})`}
+              </button>
+            ) : (
+              <button className="bg-green-500 text-white px-4 py-2 rounded-md" disabled>
+                Course Purchased
+              </button>
+            )}
+          </div>
+        </div>
+      </header>
+
+      {/* Stats Section */}
+
+      <section className="bg-light-blue text-center py-6 px-2 sm:px-6">
+        <div className="max-w-6xl mx-auto flex justify-center items-center gap-4 sm:gap-6 md:gap-6 lg:gap-12 xl:gap-40">
+          <div className="flex flex-col items-center min-w-[80px]">
+            <h3 className="text-sm sm:text-base md:text-xl lg:text-3xl font-bold">
+              {course.duration.toFixed(2)}
+            </h3>
+            <p className="text-gray-300 text-xs sm:text-sm md:text-base">
+              Hours of Course
             </p>
-            <h1 className="text-3xl md:text-4xl font-bold mt-2">
-              {course.name}
-            </h1>
-            <p className="text-lg text-gray-400 mt-3">
-              {course.shortDescription}
+          </div>
+          <div className="flex flex-col items-center min-w-[80px]">
+            <h3 className="text-sm sm:text-base md:text-xl lg:text-3xl font-bold">
+              {course.modules.length}
+            </h3>
+            <p className="text-gray-300 text-xs sm:text-sm md:text-base">
+              Total Modules
             </p>
-            {/* <div className="flex justify-center items-center gap-3 mt-6">
-              <span className="text-orange-400 text-2xl font-bold">
-                ★ {course.ratings.average}
-              </span>
-              <span className="text-gray-300">
-                ({course.ratings.totalRatings} Reviews)
-              </span>
-              <span className="text-gray-300">
-                Published By{" "}
-                <span className="text-purple-400">
-                  {course.authors[0].name}
-                </span>
-              </span>
-            </div> */}
-            <div className="flex justify-center gap-4 mt-6">
-              {!courseIncluded ? (
-                !cartIncluded ? (
-                  <button
-                    className="border border-gray-400 rounded-md px-4 py-2 hover:bg-gray-800"
-                    onClick={addToCart}
-                  >
-                    {isAdding ? (
-                      "Adding..."
-                    ) : (
-                      <span
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "5px",
-                        }}
-                      >
-                        <AiOutlineShoppingCart /> Cart
-                      </span>
-                    )}
-                  </button>
-                ) : (
-                  <button
-                    className="bg-green-500 text-white px-4 py-2 rounded-md"
-                    disabled
-                  >
-                    Added to Cart
-                  </button>
-                )
-              ) : null}
-              {!courseIncluded ? (
-                !wishlistIncluded ? (
-                  <button
-                    className="border border-gray-400 rounded-md px-4 py-2 hover:bg-gray-800"
-                    onClick={addToWishlist}
-                  >
-                    {isWishing ? (
-                      "Adding..."
-                    ) : (
-                      <span
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "5px",
-                        }}
-                      >
-                        <AiOutlineHeart /> Wishlist
-                      </span>
-                    )}
-                  </button>
-                ) : (
-                  <button
-                    className="bg-green-500 text-white px-4 py-2 rounded-md"
-                    disabled
-                  >
-                    Wishlisted
-                  </button>
-                )
-              ) : null}
-              {!courseIncluded ? (
-                <button
-                  className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-md"
-                  onClick={handlePayment}
-                >
-                  {isProcessing
-                    ? "Processing..."
-                    : `Buy Now (₹ ${course.price.current})`}
-                </button>
-              ) : (
-                <button
-                  className="bg-green-500 text-white px-4 py-2 rounded-md"
-                  disabled
-                >
-                  Course Purchased
-                </button>
-              )}
-            </div>
           </div>
-        </header>
-
-        <section className="bg-light-blue text-center py-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-6xl mx-auto">
-            <div>
-              <h3 className="text-4xl font-bold">{course.duration.toFixed(2)}</h3>
-              <p className="text-gray-300">Hours of Course</p>
-            </div>
-            <div>
-              <h3 className="text-4xl font-bold">{course.modules.length}</h3>
-              <p className="text-gray-300">Total Modules</p>
-            </div>
-            <div>
-              <h3 className="text-4xl font-bold">{course.studentsEnrolled}</h3>
-              <p className="text-gray-300">Students Enrolled</p>
-            </div>
-            {/* <div>
-              <h3 className="text-4xl font-bold">
-                {course.rewards.totalReward}
-              </h3>
-              <p className="text-gray-300">Total Rewards</p>
-            </div> */}
+          <div className="flex flex-col items-center min-w-[80px]">
+            <h3 className="text-sm sm:text-base md:text-xl lg:text-3xl font-bold">
+              {course.studentsEnrolled}
+            </h3>
+            <p className="text-gray-300 text-xs sm:text-sm md:text-base">
+              Students Enrolled
+            </p>
           </div>
-        </section>
+        </div>
+      </section>
+      
+      {/* Footer Navigation */}
+      <footer className="bg-purple-500 text-white py-4 px-4">
+        <div className="flex flex-wrap justify-center gap-4 sm:gap-8 text-sm sm:text-base">
+          <button onClick={() => handleScroll("about-course")} className="hover:underline">About Course</button>
+          <button onClick={() => handleScroll("course-content")} className="hover:underline">Course Content</button>
+          <button onClick={() => handleScroll("about-publisher")} className="hover:underline">About Publisher</button>
+          <button onClick={() => handleScroll("rewards")} className="hover:underline">Rewards</button>
+          <button onClick={() => handleScroll("faq")} className="hover:underline">FAQs</button>
+        </div>
+      </footer>
 
-        <footer className="bg-purple-500 text-center text-white py-4">
-          <div className="flex justify-center space-x-8">
-            <button
-              onClick={() => handleScroll("about-course")}
-              className="hover:underline"
-            >
-              About Course
-            </button>
-            <button
-              onClick={() => handleScroll("course-content")}
-              className="hover:underline"
-            >
-              Course Content
-            </button>
-            <button
-              onClick={() => handleScroll("about-publisher")}
-              className="hover:underline"
-            >
-              About Publisher
-            </button>
-            <button
-              onClick={() => handleScroll("rewards")}
-              className="hover:underline"
-            >
-              Rewards
-            </button>
-            <button
-              onClick={() => handleScroll("faq")}
-              className="hover:underline"
-            >
-              FAQs
-            </button>
-          </div>
-        </footer>
-      </div>
 
+    </div>
+      
+            {/* Sections */}
       <section id="about-course">
         <CoursePage course={course} />
       </section>

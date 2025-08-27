@@ -736,8 +736,13 @@ const handleModuleInputChange = (
                       </Label>
                       <Input
                         type="number"
+                        min={0}
                         value={field.number}
-                        onChange={(e) => handleModuleInputChange(moduleIndex, "number", e.target.value)}
+                        onChange={(e) => {
+                          const value = Math.max(0, Number(e.target.value))
+                          handleModuleInputChange(moduleIndex, "number", e.target.value)
+
+                        }}
                         className="h-12"
                       />
                     </div>
@@ -748,8 +753,11 @@ const handleModuleInputChange = (
                       </Label>
                       <Input
                         type="number"
+                        min={0}
                         value={field.reward}
-                        onChange={(e) => handleModuleInputChange(moduleIndex, "reward", e.target.value)}
+                        onChange={(e) =>{
+                          const value = Math.max(0, Number(e.target.value))
+                           handleModuleInputChange(moduleIndex, "reward", e.target.value)}}
                         className="h-12"
                       />
                     </div>
@@ -848,11 +856,20 @@ const handleModuleInputChange = (
                                 </Label>
                                 <Input
                                   type="number"
+                                  min={0}
                                   value={row.partNumber}
-                                  onChange={(e) => handleInternalDetailChange(moduleIndex, subIndex, "partNumber", Number(e.target.value))}
+                                  onChange={(e) => {
+                                    const value = Math.max(0, Number(e.target.value))
+                                    handleInternalDetailChange(moduleIndex, subIndex, "partNumber", Number(e.target.value))
+
+                                  }}
                                   className="h-10"
                                 />
                               </div>
+
+
+ 
+
                               <div className="space-y-2">
                                 <Label className="font-semibold">
                                   Part Name <span className="text-red-500">*</span>

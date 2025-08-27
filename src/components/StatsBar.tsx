@@ -96,25 +96,21 @@ const StatsBar: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex justify-center space-x-10 sm:space-x-20  md:space-x-48 p-8 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg shadow-lg">
-      <div className="text-center transform hover:scale-105 transition duration-300">
-        <h2 className="text-4xl font-extrabold">
-          {students}+
-        </h2>
-        <p className="text-lg font-medium opacity-90">Total Students</p>
-      </div>
-      <div className="text-center transform hover:scale-105 transition duration-300">
-        <h2 className="text-4xl font-extrabold">
-          {enrolled}+
-        </h2>
-        <p className="text-lg font-medium opacity-90">Courses Enrolled</p>
-      </div>
-      <div className="text-center transform hover:scale-105 transition duration-300">
-        <h2 className="text-4xl font-extrabold">
-          {completed}+
-        </h2>
-        <p className="text-lg font-medium opacity-90">Courses Completed</p>
-      </div>
+    <div className="flex justify-center space-x-10 sm:space-x-20 max-w-7xl mx-auto md:space-x-48 p-8 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg shadow-lg">
+<div className="text-center transform hover:scale-105 transition duration-300">
+  <h2 className="text-lg sm:text-xl md:text-2xl font-bold">{students}+</h2>
+  <p className="text-xs sm:text-sm md:text-base font-medium opacity-90">Total Students</p>
+</div>
+
+<div className="text-center transform hover:scale-105 transition duration-300">
+  <h2 className="text-lg sm:text-xl md:text-2xl font-bold">{enrolled}+</h2>
+  <p className="text-xs sm:text-sm md:text-base font-medium opacity-90">Courses Enrolled</p>
+</div>
+
+<div className="text-center transform hover:scale-105 transition duration-300">
+  <h2 className="text-lg sm:text-xl md:text-2xl font-bold">{completed}+</h2>
+  <p className="text-xs sm:text-sm md:text-base font-medium opacity-90">Courses Completed</p>
+</div>
     </div>
   );
 };

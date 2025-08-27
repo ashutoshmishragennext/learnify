@@ -108,7 +108,7 @@ const Footer: React.FC = () => {
 
       {/* Footer Bottom Text */}
       <div className="mt-8 text-center text-sm border-t border-purple-400 pt-4">
-        <p>Design with love © TeamABESIT 2024. All rights reserved.</p>
+        <p>GenNext IT 2025. All rights reserved.</p>
       </div>
     </footer>
   );

@@ -244,7 +244,7 @@ const ProfileSection: React.FC<{ session: Session | null| undefined }> = ({ sess
         ${isOpen ? "translate-x-0" : "translate-x-full"} md:translate-x-0 md:relative`}
       >
         <div className="flex flex-col items-center">
-          <div className="relative w-24 h-24 mt-3 rounded-full border-4 border-purple-500 overflow-hidden">
+          <div className="relative w-24 h-24 lg:mt-3 mt-20 rounded-full border-4 border-purple-500 overflow-hidden">
             {loading ? (
               <div className="loader">Loading...</div>
             ) : profileImage ? (

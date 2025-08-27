@@ -110,13 +110,14 @@ const CartPage : React.FC<{ session?: Session | null }> = ({ session }) => {
       </div>
 
       {/* Cart Section */}
-      <div className="w-3/4 p-2">
-        <h2 className="text-4xl font-extrabold text-gray-800 mb-6">
+      <div className="min-h-screen flex flex-col md:flex-row bg-gray-50 px-4 sm:px-6 md:px-8 py-6">
+      <div className="w-full md:w-3/4 mx-auto">
+        <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-800 mb-6 text-center md:text-left">
           Shopping Cart
         </h2>
 
         {cart.length === 0 ? (
-          <p className="text-lg font-semibold text-gray-600">
+          <p className="text-lg font-semibold text-gray-600 text-center">
             Your cart is empty
           </p>
         ) : (
@@ -124,13 +125,14 @@ const CartPage : React.FC<{ session?: Session | null }> = ({ session }) => {
             {cart.map((item) => (
               <div
                 key={item._id}
-                className="relative flex items-center gap-6 bg-white p-6 rounded-lg shadow-md border-l-8 border-purple-500 hover:shadow-lg transition transform hover:-translate-y-1 duration-300"
+                className="relative flex flex-col sm:flex-row items-center sm:items-start gap-6 bg-white p-6 rounded-lg shadow-md border-l-8 border-purple-500 hover:shadow-lg transition transform hover:-translate-y-1 duration-300"
               >
+                {/* Remove Button */}
                 <button
                   onClick={() => handleRemove(item.courseId)}
-                  className="absolute top-3 right-3 text-red-500 hover:text-red-700 transition w-6 h-6 flex items-center justify-center"
+                  className="absolute top-1 right-3 text-red-500 hover:text-red-700 transition w-6 h-6 flex items-center justify-center"
                 >
-                  {removingCourse === item.courseId ? ( // Now both are strings, so comparison works
+                  {removingCourse === item.courseId ? (
                     <ClipLoader size={20} color="red" />
                   ) : (
                     <TrashIcon className="w-6 h-6" />
@@ -147,56 +149,33 @@ const CartPage : React.FC<{ session?: Session | null }> = ({ session }) => {
                     className="object-cover w-full h-full"
                   />
                 </div>
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {item.name}
-                  </h3>
-                  <p className="text-sm text-gray-600 mt-1">
-                    {item.shortDescription}
-                  </p>
+
+                {/* Course Info */}
+                <div className="flex-1 text-center sm:text-left">
+                  <h3 className="text-lg font-semibold text-gray-900">{item.name}</h3>
+                  <p className="text-sm text-gray-600 mt-1">{item.shortDescription}</p>
                   <p className="text-xs text-gray-500 mt-1">
                     Enrolled: +{formatStudents(item.studentsEnrolled)} students
                   </p>
                 </div>
 
                 {/* Pricing & Actions */}
-                <div className="text-right">
-                  <p className="text-xl font-bold text-gray-900">
-                    ₹{item.price.current}
-                  </p>
-                  <p className="text-sm text-gray-500 line-through">
-                    ₹{item.price.original}
-                  </p>
+                <div className="text-center sm:text-right">
+                  <p className="text-xl font-bold text-gray-900">₹{item.price.current}</p>
+                  <p className="text-sm text-gray-500 line-through">₹{item.price.original}</p>
                   <button
                     onClick={() =>
-                      handlePayment(
-                        item.price.current,
-                        item.name,
-                        item.courseId
-                      )
+                      handlePayment(item.price.current, item.name, item.courseId)
                     }
                     className={`mt-3 px-5 py-2 text-white rounded-lg transition shadow-md ${
-                      processingCourse === item.courseId // Now both are strings, so comparison works
+                      processingCourse === item.courseId
                         ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-gradient-to-r from-purple-500 to-indigo-600  hover:bg-green-700"
+                        : "bg-gradient-to-r from-purple-500 to-indigo-600 hover:bg-green-700"
                     }`}
-                    disabled={processingCourse === item.courseId} // Now both are strings, so comparison works
+                    disabled={processingCourse === item.courseId}
                   >
-                    {processingCourse === item.courseId
-                      ? "Processing..."
-                      : "Pay Now"}
+                    {processingCourse === item.courseId ? "Processing..." : "Pay Now"}
                   </button>
-
-                  {/* {isRemoving ? (
-                    <ClipLoader size={30} color="red" />
-                  ) : (
-                    <button
-                      onClick={() => handleRemove(item.courseId)}
-                      className="px-2 text-red-500 hover:text-red-700 transition"
-                    >
-                      <TrashIcon className="w-6 h-6" />
-                    </button>
-                  )} */}
                 </div>
               </div>
             ))}
@@ -204,8 +183,8 @@ const CartPage : React.FC<{ session?: Session | null }> = ({ session }) => {
         )}
 
         {cart.length > 0 && (
-          <div className="mt-8 p-6 bg-white shadow-md rounded-lg flex justify-between items-center border-t-4 border-blue-500">
-            <h3 className="text-2xl font-bold text-gray-800">
+          <div className="mt-8 p-6 bg-white shadow-md rounded-lg flex flex-col sm:flex-row justify-between items-center border-t-4 border-blue-500">
+            <h3 className="text-2xl font-bold text-gray-800 mb-4 sm:mb-0 text-center sm:text-left">
               Total: ₹{totalAmount}
             </h3>
             <button
@@ -213,16 +192,17 @@ const CartPage : React.FC<{ session?: Session | null }> = ({ session }) => {
                 handlePayment(
                   totalAmount,
                   "Total Cart Payment",
-                  cart.map((course) => course.courseId) // Now returns string[], which matches the expected type
+                  cart.map((course) => course.courseId)
                 )
               }
-              className="px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-600  text-white font-semibold rounded-lg hover:bg-blue-700 transition shadow-md"
+              className="px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition shadow-md"
             >
               {isBuyingAll ? "Processing..." : "Checkout"}
             </button>
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 };
